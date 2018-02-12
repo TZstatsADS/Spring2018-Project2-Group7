@@ -1,42 +1,49 @@
 library(shiny)
-library(leaflet)
+data <- read.csv("state_M2016.csv")
+data.Alabama <- data[(1:1000)[data$STATE=="Alabama"],]
+major <- as.character(data.Alabama[(1:nrow(data.Alabama))[data.Alabama$OCC_GROUP=="major"],"OCC_TITLE"])
+major
 
-# Define UI for application that draws a histogram
-shinyUI(fluidPage(
-  
-  # Application title
-  titlePanel("2009 Manhattan Housing Sales"),
-  
-  # Sidebar with a selector input for neighborhood
-  sidebarLayout(
-    sidebarPanel(
-      selectInput("nbhd", label = h5("Choose a Manhattan Neighborhood"), 
-                         choices = list("all neighborhoods"=0,
-                                        "Central Harlem"=1, 
-                                        "Chelsea and Clinton"=2,
-                                        "East Harlem"=3, 
-                                        "Gramercy Park and Murray Hill"=4,
-                                        "Greenwich Village and Soho"=5, 
-                                        "Lower Manhattan"=6,
-                                        "Lower East Side"=7, 
-                                        "Upper East Side"=8, 
-                                        "Upper West Side"=9,
-                                        "Inwood and Washington Heights"=10), 
-                         selected = 0)
-      #sliderInput("p.range", label=h3("Price Range (in thousands of dollars)"),
-      #            min = 0, max = 20000, value = c(200, 10000))
-    ),
-    # Show two panels
-    mainPanel(
-      #h4(textOutput("text")),
-      h3(code(textOutput("text1"))),
-      tabsetPanel(
-        # Panel 1 has three summary plots of sales. 
-        tabPanel("Sales summary", plotOutput("distPlot")), 
-        # Panel 2 has a map display of sales' distribution
-        tabPanel("Sales map", plotOutput("distPlot1"))),
-      leafletOutput("map", width = "80%", height = "400px")
-    )
- )
-))
 
+ui<- navbarPage(
+  
+  ##link to css.file
+  theme = "bootstrap2.css",
+
+  ##Project Title
+  "iJob - Your Job Advisor",
+  
+  tabPanel("Home",
+           htmlOutput("blankspace"),
+           titlePanel("TRACE OF AROMA"),
+           h4(htmlOutput("text")),
+           htmlOutput("teammates")
+  ),
+  
+
+  
+  ## Find Your Location
+  tabPanel("Find Your Location",
+           titlePanel("Find Your Location"),
+           
+           leafletOutput("usmap",width = "100%", height = 600),
+           
+           absolutePanel(
+             id = "controls", class = "panel panel-default", fixed = TRUE,
+                         draggable = TRUE, 
+                         top = 180, left = 60, right = "auto", bottom = "auto",
+                         width = 350, height = "auto",
+                         
+                         h2("Job Search"),
+                         
+                         selectInput(inputId = "major",
+                                     label  = "Select the Occupations",
+                                     choices = major,
+                                     selected ='Management Occupations'),
+                         radioButtons(inputId = "crime_climate",
+                                      label  = "Display Crime/Climate",
+                                      choices = c('Crime','Climate'),
+                                      selected ='Crime')
+                                    )
+  )
+)

@@ -1,0 +1,67 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r load_libs, message=F}
+if (!require("DT")) install.packages('DT')
+if (!require("dtplyr")) install.packages('dtplyr')
+if(!require("lubridate")) install.packages('lubridate')
+
+library(dtplyr)
+library(dplyr)
+library(DT)
+library(lubridate)
+```
+
+
+
+```{r}
+library(shiny)
+```
+
+# Read 2016 data
+```{r}
+state2016=read.csv(file="../data/state_M2016.csv", stringsAsFactors = F)
+
+data = subset(state2016,Commodity_Name == as.character(input$commodity_2D))
+
+# datatable(sample_n(state2016, 50))
+```
+
+# Management Occupation for all states
+```{r}
+MO2016 <- state2016[state2016$OCC_GROUP=="major", ]
+
+sum(is.na(MO2016$A_MEAN))
+
+```
+
+```{r, warning=F}
+library(ggmap)
+usa_center = as.numeric(geocode("United States"))
+
+st <- as.factor(MO2016$STATE)
+sr_u <- levels(st)
+loc <- geocode(sr_u)
+geocode("New Jersey")
+
+df <- cbind(sr_u, loc)
+colnames(df) <- c("STATE", "lon", "lat")
+
+write.csv(df, "StateCoordinate.csv")
+
+?merge
+
+merge(MO2016,df, by = "STATE", all.x=T)
+
+USAMap = ggmap(get_googlemap(center=usa_center, scale=2, zoom=4), extent="normal")
+
+```
+
+```{r}
+
+```
+
+
+
