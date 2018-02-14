@@ -83,11 +83,32 @@ server<- function(input, output){
     
     mapStates = map("state", fill = TRUE, plot = FALSE)
     
+    labels <- sprintf(
+      "<strong>%s</strong><br/>%g Annual Salary",
+      tmp$STATE, tmp$A_MEAN) %>% 
+      lapply(htmltools::HTML)
+    
     leaflet(data = mapStates) %>% addTiles() %>%
-      addPolygons(fillColor = ~pal(tmp$A_MEAN), weight = 2, opacity = 1, 
-                  color = "white",dashArray = "3", fillOpacity = 0.7) %>%
+      addPolygons(fillColor = ~pal(tmp$A_MEAN), 
+                  weight = 2, 
+                  opacity = 1, 
+                  color = "white",
+                  dashArray = "3", 
+                  fillOpacity = 0.7, 
+                  highlight = highlightOptions(
+                    weight = 5,
+                    color = "#666",
+                    dashArray = "",
+                    fillOpacity = 0.7,
+                    bringToFront = TRUE),
+                  label = labels,
+                  labelOptions = labelOptions(
+                    style = list("font-weight" = "normal", 
+                                 padding = "3px 8px"),
+                    textsize = "15px",
+                    direction = "auto")) %>%
       addLegend("bottomright", pal = pal, values = ~tmp$A_MEAN,
-                title = "Wage Level",
+                title = "Salary Level",
                 labFormat = labelFormat(prefix = "$"),
                 opacity = 1)
     
