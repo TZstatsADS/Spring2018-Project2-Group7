@@ -13,9 +13,9 @@ data <- read.csv("state_M2016.csv")
 data.Alabama <- data[(1:1000)[data$STATE=="Alabama"],]
 major <- as.character(data.Alabama[(1:nrow(data.Alabama))[data.Alabama$OCC_GROUP=="major"],"OCC_TITLE"])
 
-detail11<-grep(data$OCC_CODE,pattern = "11.[1-9]...")
-detail<-data[detail11,]$OCC_TITLE
-detail<-unique(detail)
+code.detail11<-grep(data$OCC_CODE,pattern = "11.[1-9]...")
+detail11<-data[code.detail11,]$OCC_TITLE
+detail11<-unique(detail11)
 # major
 
 
@@ -63,7 +63,7 @@ ui<- navbarPage(
                            condition = "input.major == 'Management Occupations'",
                            selectInput(inputId="details",
                            label="Select Details", 
-                           choices=detail)),
+                           choices=detail11)),
                          
                          radioButtons(inputId = "crime_climate",
                                       label  = "Display Crime/Climate",
