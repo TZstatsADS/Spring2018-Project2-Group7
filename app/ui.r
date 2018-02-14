@@ -1,8 +1,13 @@
-library(shiny)
+library("varhandle")
+library("leaflet")
+library("shiny")
+library("ggmap")
+library("ggplot2")
+
 data <- read.csv("state_M2016.csv")
 data.Alabama <- data[(1:1000)[data$STATE=="Alabama"],]
 major <- as.character(data.Alabama[(1:nrow(data.Alabama))[data.Alabama$OCC_GROUP=="major"],"OCC_TITLE"])
-major
+# major
 
 
 ui<- navbarPage(
@@ -15,7 +20,7 @@ ui<- navbarPage(
   
   tabPanel("Home",
            htmlOutput("blankspace"),
-           titlePanel("TRACE OF AROMA"),
+           titlePanel("iJob - Your Job Advisor"),
            h4(htmlOutput("text")),
            htmlOutput("teammates")
   ),

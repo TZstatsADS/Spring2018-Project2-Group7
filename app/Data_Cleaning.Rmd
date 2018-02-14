@@ -1,0 +1,23 @@
+---
+title: "Data_cleaning"
+author: "Wenshan Wang"
+date: "2/14/2018"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+data <- read.csv("state_M2016.csv",header = TRUE,stringsAsFactors = FALSE)
+state.coordinate <- read.csv("state_coordinate.csv",header = TRUE,stringsAsFactors = FALSE)
+df = merge(data,state.coordinate, by = "STATE", all.x=T)
+df = df[,c("ST","STATE","OCC_TITLE","OCC_GROUP","A_MEAN","lon","lat")]
+```
+
+```{r}
+df$A_MEAN <- as.numeric(gsub(",", "", df$A_MEAN))
+write.csv(df, "salary2016.csv")
+```
+
