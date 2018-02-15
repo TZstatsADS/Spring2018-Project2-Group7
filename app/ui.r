@@ -6,7 +6,7 @@ library("shiny")
 library("ggmap")
 library("ggplot2")
 library("maps")
-
+library("plotly")
 
 
 data <- read.csv("state_M2016.csv",header = TRUE,stringsAsFactors = FALSE)
@@ -73,10 +73,20 @@ ui<- navbarPage(
                           selected ='Crime')
              
              
-           )
+           )#,
+         #  absolutePanel(id = "controls", class = "panel panel-default", fixed= TRUE, draggable = TRUE,
+      #                   top = 120, left = "auto", right = 20, bottom = "auto", width = 320, height = "auto",
+      #                   h2("Related Info"),
+      #                   br(),
+     #                    p(textOutput("pclick")),
+      #                   h3("State:"),
+      #                   p(strong(textOutput("state_name"))),
+      #                   br(),
+      #                   h3(strong("GDP Trend:")),
+       #                  plotlyOutput("click_gdp_trend", height="150") #click_complaint_timedist
+      #     )
            
   )
-  
 )
 
 

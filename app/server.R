@@ -15,7 +15,7 @@ library("ggmap")
 library("ggplot2")
 library("maps")
 library("RColorBrewer")
-
+library("plotly")
 data <- read.csv("salary2016.csv",header = TRUE,stringsAsFactors = FALSE)
 
 
@@ -119,5 +119,27 @@ server<- function(input, output){
   }
   
   )
+  
+  #  observeEvent(input$map_click,{
+    # Get the click info
+    #  click <- input$map_click
+    #  clat <- click$lat
+    #  clng <- click$lng
+    #   geo_information <- revgeocode(c(clat,clng), output = "all")
+    #   state_name <- geo_information[["results"]][[2]]$address_components[[5]]$long_name
+    
+    #   output$pclick <- input$map_click
+    
+    #  output$click_gdp_trend<- renderPlotly({
+      #     df <- as.data.frame(t(gdp.aer.rpp)[1:4,])
+      #     colnames(df) <- gdp.aer.rpp[,1]
+      #     df <- df[-1,]
+      #      plot.df <- data.frame(year=2014:2016,gdp=df[,state_name])
+      #      plot_ly(x=plot.df$year,y=plot.df$gdp, type='scatter', mode = 'lines') %>%
+        #       layout(xaxis=list(title="Years",tickfont=list(size=9)),
+               #               yaxis=list(title="GDP",tickfont=list(size=9)))
+      #    })
+#  })
+  
 }
 ## end 2D map
