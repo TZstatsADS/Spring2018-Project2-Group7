@@ -21,3 +21,21 @@ df$A_MEAN <- as.numeric(gsub(",", "", df$A_MEAN))
 write.csv(df, "salary2016.csv")
 ```
 
+```{r}
+data <- read.csv("state_M2016.csv",header = TRUE,stringsAsFactors = FALSE)
+data <- data[, c("ST","STATE","OCC_CODE","OCC_TITLE","OCC_GROUP","A_MEAN")]
+data$A_MEAN <- as.numeric(gsub(",", "", data$A_MEAN))
+```
+
+```{r}
+occ_code_fac <- as.factor(data$OCC_CODE)
+occ_code_unique <- levels(occ_code_fac)
+
+first2 <- substr(data$OCC_CODE, 1, 2)
+
+length(data$ST=="AL")
+
+```
+
+
+

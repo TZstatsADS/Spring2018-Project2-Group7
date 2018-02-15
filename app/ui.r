@@ -9,14 +9,21 @@ library("maps")
 
 
 
-data <- read.csv("state_M2016.csv")
-data.Alabama <- data[(1:1000)[data$STATE=="Alabama"],]
-major <- as.character(data.Alabama[(1:nrow(data.Alabama))[data.Alabama$OCC_GROUP=="major"],"OCC_TITLE"])
+data <- read.csv("state_M2016.csv",header = TRUE,stringsAsFactors = FALSE)
+data.Alabama <- data[data$STATE=="Alabama",]
+major <- as.character(data.Alabama[data.Alabama$OCC_GROUP=="major","OCC_TITLE"])
+data.Alabama$first2 <- substr(data.Alabama$OCC_CODE, 1, 2)
 
-code.detail11<-grep(data$OCC_CODE,pattern = "11.[1-9]...")
-detail11<-data[code.detail11,]$OCC_TITLE
-detail11<-unique(detail11)
-# major
+
+
+return_detail_given_major <- function(major_str){
+  first2_code <- data.Alabama[data.Alabama$OCC_TITLE==major_str, "first2"]
+  detail<-data.Alabama[data.Alabama$first2 == first2_code, "OCC_TITLE"]
+  return(unique(detail))
+}
+
+detail_list <- sapply(major, return_detail_given_major)
+
 
 
 
@@ -24,7 +31,7 @@ ui<- navbarPage(
   
   ##link to css.file
   theme = "bootstrap2.css",
-
+  
   ##Project Title
   "iJob - Your Job Advisor",
   
@@ -35,7 +42,7 @@ ui<- navbarPage(
            htmlOutput("teammates")
   ),
   
-
+  
   
   ## Find Your Location
   tabPanel("Find Your Location",
@@ -45,33 +52,32 @@ ui<- navbarPage(
            
            absolutePanel(
              id = "controls", class = "panel panel-default", fixed = TRUE,
-                         draggable = TRUE, 
-                         top = 180, left = 60, right = "auto", bottom = "auto",
-                         width = 350, height = "auto",
-                         h2("Job Search"),
+             draggable = TRUE, 
+             top = 180, left = 60, right = "auto", bottom = "auto",
+             width = 350, height = "auto",
+             h2("Job Search"),
              
-             sidebarPanel(
-               top = 180, left = 60, right = "auto", bottom = "auto",
-               width = 350, height = "auto",
-              
-                         selectInput(inputId = "major",
-                                     label  = "Select the Occupations",
-                                     choices = major,
-                                     selected ='Management Occupations'),
-                         
-                         conditionalPanel(
-                           condition = "input.major == 'Management Occupations'",
-                           selectInput(inputId="details",
-                           label="Select Details", 
-                           choices=detail11)),
-                         
-                         radioButtons(inputId = "crime_climate",
-                                      label  = "Display Crime/Climate",
-                                      choices = c('Crime','Climate'),
-                                      selected ='Crime')
-                                    )
+             
+             
+             
+             selectizeInput(inputId = "occupation",
+                            label  = "Select the Occupations",
+                            choices = detail_list,
+                            selected ='Management Occupations'),
+             
+             
+             
+             radioButtons(inputId = "crime_climate",
+                          label  = "Display Crime/Climate",
+                          choices = c('Crime','Climate'),
+                          selected ='Crime')
+             
+             
            )
+           
   )
+  
 )
+
 
 
