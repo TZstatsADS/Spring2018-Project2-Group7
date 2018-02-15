@@ -1,0 +1,57 @@
+RPP1 Regional Price Parities by state,,,,
+RPPs: Goods (index) ,,,,
+Bureau of Economic Analysis ,,,,
+State or DC,,,,
+GeoFips,GeoName,2014,2015,2016
+0,United States,99.4,99.4,99.4
+1000,Alabama,96,95.9,95.9
+2000,Alaska,101.1,101,101
+4000,Arizona,98.1,98.1,98.1
+5000,Arkansas,94.6,94.7,94.7
+6000,California,103.7,103.6,103.6
+8000,Colorado,99.9,100.1,100.1
+9000,Connecticut,104.6,104.5,104.5
+10000,Delaware,99.7,99.6,99.7
+11000,District of Columbia,106,105.9,105.9
+12000,Florida,98.2,98.2,98.2
+13000,Georgia,96.7,96.8,96.8
+15000,Hawaii,109.3,109.1,109.2
+16000,Idaho,98,98,98
+17000,Illinois,100.1,100.1,100.1
+18000,Indiana,97.2,97.2,97.2
+19000,Iowa,95.3,95.4,95.4
+20000,Kansas,95.9,95.8,95.8
+21000,Kentucky,94.2,94.3,94.3
+22000,Louisiana,96.3,96.2,96.2
+23000,Maine,98.7,98.5,98.5
+24000,Maryland,103.4,103.4,103.4
+25000,Massachusetts,100.6,100.7,100.7
+26000,Michigan,97.9,97.7,97.7
+27000,Minnesota,100.8,100.8,100.8
+28000,Mississippi,93.8,94,93.9
+29000,Missouri,95.2,95.2,95.2
+30000,Montana,98.4,98.5,98.5
+31000,Nebraska,95.8,95.8,95.9
+32000,Nevada,96.8,96.7,96.8
+33000,New Hampshire,100.1,100.1,100.1
+34000,New Jersey,102.6,102.6,102.7
+35000,New Mexico,97.3,97.3,97.3
+36000,New York,108.7,108.6,108.6
+37000,North Carolina,96.1,96,96
+38000,North Dakota,95.1,95.2,95.2
+39000,Ohio,95.9,96,96
+40000,Oklahoma,95.3,95.4,95.4
+41000,Oregon,98.6,98.6,98.7
+42000,Pennsylvania,99.7,99.6,99.6
+44000,Rhode Island,98.4,98.3,98.3
+45000,South Carolina,96.4,96.3,96.3
+46000,South Dakota,94.9,95,95
+47000,Tennessee,95.9,95.9,95.9
+48000,Texas,96.8,96.8,96.8
+49000,Utah,97.1,97,97.1
+50000,Vermont,98.6,98.4,98.4
+51000,Virginia,99.5,99.5,99.5
+53000,Washington,104,103.8,103.8
+54000,West Virginia,94.5,94.6,94.6
+55000,Wisconsin,96.1,96.2,96.2
+56000,Wyoming,98.3,98.4,98.4

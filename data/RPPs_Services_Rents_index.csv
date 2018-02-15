@@ -1,0 +1,57 @@
+RPP1 Regional Price Parities by state,,,,
+RPPs: Services: Rents (index) ,,,,
+Bureau of Economic Analysis ,,,,
+State or DC,,,,
+GeoFips,GeoName,2014,2015,2016
+0,United States,101.2,101.1,101.1
+1000,Alabama,63.6,63.8,62.8
+2000,Alaska,138.9,144.4,139.4
+4000,Arizona,91.8,91.4,91.4
+5000,Arkansas,63.2,62.9,63.9
+6000,California,145.8,147.4,147.3
+8000,Colorado,109.6,111.3,114.7
+9000,Connecticut,115.6,116.3,116.8
+10000,Delaware,98,101.8,97.6
+11000,District of Columbia,156.4,161.6,154.3
+12000,Florida,104.5,105,105.4
+13000,Georgia,79.6,79,81.1
+15000,Hawaii,159.3,159,163.4
+16000,Idaho,76.9,79.6,78.7
+17000,Illinois,100.7,99.5,99.4
+18000,Indiana,76.2,75.6,74.9
+19000,Iowa,76.1,75.1,75.3
+20000,Kansas,76.7,75.6,74.6
+21000,Kentucky,69.6,68,68.9
+22000,Louisiana,76.9,77.7,76.2
+23000,Maine,97.4,92.7,95.8
+24000,Maryland,125.9,126.5,123.9
+25000,Massachusetts,123.3,123.1,123.3
+26000,Michigan,82,82,81.1
+27000,Minnesota,95.5,95.6,95
+28000,Mississippi,64.1,63.4,63.1
+29000,Missouri,75.5,74.5,73.6
+30000,Montana,83.5,83.8,85.5
+31000,Nebraska,76.1,75.8,76.3
+32000,Nevada,97.5,95.2,95.3
+33000,New Hampshire,122,119.4,118.1
+34000,New Jersey,134.8,136.3,132.8
+35000,New Mexico,83.6,83.8,81.2
+36000,New York,135.1,135.8,133.9
+37000,North Carolina,79.9,79.8,78.7
+38000,North Dakota,83.1,82.4,86.4
+39000,Ohio,73.8,72.9,72.9
+40000,Oklahoma,70.7,71.3,72
+41000,Oregon,100,101.2,101.5
+42000,Pennsylvania,90.4,88.7,88.7
+44000,Rhode Island,99.8,101.7,100.2
+45000,South Carolina,75.8,75.7,76.3
+46000,South Dakota,66.7,67.3,68.5
+47000,Tennessee,75.3,73.7,73.7
+48000,Texas,90.4,91.4,92.9
+49000,Utah,93.3,92,91.2
+50000,Vermont,113.3,118.3,117
+51000,Virginia,113.8,112.3,111.8
+53000,Washington,111.3,112.7,113.2
+54000,West Virginia,62.9,64.4,66
+55000,Wisconsin,86.2,86.6,85.9
+56000,Wyoming,89.9,93.5,91.5
