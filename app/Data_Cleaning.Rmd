@@ -38,4 +38,22 @@ length(data$ST=="AL")
 ```
 
 
+```{r}
+df1 <- read.csv("GDP_AER_RPP.csv", header = T, stringsAsFactors = F)
+df1 <- df1[,c("Area", "RPPs_Goods_2016", "RPPs_Rents_2016")]
+df1$Area <- toupper(df1$Area)
+colnames(df1) <- c("STATE", "Price_Level", "Rent_Price")
+
+df2 <- read.csv("crime rate 2016.csv", header = T, stringsAsFactors = F)
+colnames(df2) <- c("STATE", "Crime_Rate")
+
+df3 <- merge(df2, df1, by = "STATE", all.x = T)
+
+df4 <- read.csv("sunnydays.csv", header = T, stringsAsFactors = F)
+df4$STATE <- toupper(df4$STATE)
+
+df5 <- merge(df3, df4, by = "STATE", all.x = T)
+
+write.csv(df5, "State_Info.csv")
+```
 

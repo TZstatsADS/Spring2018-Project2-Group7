@@ -15,12 +15,34 @@ library("ggmap")
 library("ggplot2")
 library("maps")
 library("RColorBrewer")
-library("plotly")
+
+
 data <- read.csv("salary2016.csv",header = TRUE,stringsAsFactors = FALSE)
 
+si <- read.csv("State_info.csv", header = T, stringsAsFactors = F)
+which_state <- function(mapData, long, lat) {
+  mapData$long_diff <- mapData$long - long
+  mapData$lat_diff <- mapData$lat - lat
+  
+  # only compare borders near the clicked point to save computing time
+  mapData <- mapData[abs(mapData$long_diff) < 20 & abs(mapData$lat_diff) < 15, ]
+  
+  # calculate the angle between the vector from this clicked point to border and c(1, 0)
+  vLong <- mapData$long_diff
+  vLat <- mapData$lat_diff
+  mapData$angle <- acos(vLong / sqrt(vLong^2 + vLat^2))
+  
+  # calculate range of the angle and select the state with largest range
+  rangeAngle <- tapply(mapData$angle, mapData$region, function(x) max(x) - min(x))
+  return(names(sort(rangeAngle, decreasing = TRUE))[1])
+}
+plotMap <- ggplot(usaMap, aes(x = long, y = lat, group = group)) + 
+  geom_polygon(fill = "white", color = "black")
+plotInfo <- ggplot(si, aes(x = Rent_Price, y = Price_Level)) + 
+  geom_point(aes(size = Crime_Rate, color = Cleardays)) 
 
 
-server<- function(input, output){
+server<- function(input, output, session){
   
   ##Introduction
   output$blankspace = renderUI({
@@ -40,64 +62,34 @@ server<- function(input, output){
   output$usmap <- renderLeaflet({
     
     tmp <- data
-    
     tmp<-subset(data,OCC_TITLE == as.character(input$occupation))
     
+    mapStates = map("state", fill = TRUE, plot = FALSE)
+    
+    state.shortname <- as.data.frame(substr(mapStates$names, 1, 8))
+    colnames(state.shortname) <- "state.shortname"
+    tmp$state.shortname <- substr(tolower(tmp$STATE), 1, 8)
+    tmp.ordered <- merge(state.shortname, tmp, by="state.shortname", all.x = T)
+    
     if(nrow(tmp)>0){
-      
-      ###### 
-      
-      # SetColor <- function(tmp) {
-      #   sapply(tmp$A_MEAN, function(wage) {
-      #     if(wage <= 30000) {
-      #       "lightgray"
-      #     } else if(wage <= 40000) {
-      #       "lightblue"
-      #     } else if(wage <= 50000) {
-      #       "blue"
-      #     } else if(wage <= 70000) {
-      #       "darkblue"
-      #     } else {
-      #       "black"
-      #     } })
-      # }
-      # 
-      # icons <- awesomeIcons(
-      #   icon = 'ios-close',
-      #   iconColor = 'white',
-      #   library = 'ion',
-      #   markerColor = paste(SetColor(tmp))
-      # )
-      # 
-      # 
-      # 
-      # Colors = c("lightgray","lightblue","blue","darkblue","black")
-      # Labels = c("<= 30000","<= 40000","<= 50000","<= 70000","> 70000")
-      # 
-      # leaflet(tmp)%>%addProviderTiles("Esri.WorldStreetMap")%>%
-      #   addAwesomeMarkers(~lon, ~lat, icon=icons, label=~as.character(A_MEAN))%>%  
-      #   setView(lng=-30,lat=28,zoom=2)%>%#put US in the centre
-      #   addLegend("topright", colors = Colors, labels = Labels,
-      #             title = "Wage Level<br/>From Low to High",
-      #             labFormat = labelFormat(prefix = "$"),
-      #             opacity = 1)
-      
-      pal <- colorNumeric(palette="YlGnBu", domain=tmp$A_MEAN)
-      
-      mapStates = map("state", fill = TRUE, plot = FALSE)
+      pal <- colorNumeric(palette="YlGnBu", domain=tmp.ordered$A_MEAN)
       
       labels <- sprintf(
         "<strong>%s</strong><br/>$ %g Annual Salary",
-        tmp$STATE, tmp$A_MEAN) %>% 
+        tmp.ordered$STATE, tmp.ordered$A_MEAN) %>% 
         lapply(htmltools::HTML)
       
-      leaflet(data = mapStates) %>% addTiles() %>%
-        addPolygons(fillColor = ~pal(tmp$A_MEAN), 
-                    weight = 2, 
-                    opacity = 1, 
+      
+      leaflet(data = mapStates) %>%
+        addProviderTiles("Stamen.TonerLite") %>%  # default map, base layer
+        
+        addPolygons(fillColor = ~pal(tmp.ordered$A_MEAN),
+                    weight = 2,
+                    opacity = 1,
                     color = "white",
-                    dashArray = "3", 
-                    fillOpacity = 0.7, 
+                    dashArray = "3",
+                    fillOpacity = 0.7,
+                    layerId = ~tmp.ordered$STATE,
                     highlight = highlightOptions(
                       weight = 5,
                       color = "#666",
@@ -106,7 +98,7 @@ server<- function(input, output){
                       bringToFront = TRUE),
                     label = labels,
                     labelOptions = labelOptions(
-                      style = list("font-weight" = "normal", 
+                      style = list("font-weight" = "normal",
                                    padding = "3px 8px"),
                       textsize = "15px",
                       direction = "auto")) %>%
@@ -114,32 +106,78 @@ server<- function(input, output){
                   title = "Salary Level",
                   labFormat = labelFormat(prefix = "$"),
                   opacity = 1)
+      
     }
     
-  }
-  
-  )
-  
-  #  observeEvent(input$map_click,{
-    # Get the click info
-    #  click <- input$map_click
-    #  clat <- click$lat
-    #  clng <- click$lng
-    #   geo_information <- revgeocode(c(clat,clng), output = "all")
-    #   state_name <- geo_information[["results"]][[2]]$address_components[[5]]$long_name
+    ###### 
     
-    #   output$pclick <- input$map_click
+    # SetColor <- function(tmp) {
+    #   sapply(tmp$A_MEAN, function(wage) {
+    #     if(wage <= 30000) {
+    #       "lightgray"
+    #     } else if(wage <= 40000) {
+    #       "lightblue"
+    #     } else if(wage <= 50000) {
+    #       "blue"
+    #     } else if(wage <= 70000) {
+    #       "darkblue"
+    #     } else {
+    #       "black"
+    #     } })
+    # }
+    # 
+    # icons <- awesomeIcons(
+    #   icon = 'ios-close',
+    #   iconColor = 'white',
+    #   library = 'ion',
+    #   markerColor = paste(SetColor(tmp))
+    # )
+    # 
+    # 
+    # 
+    # Colors = c("lightgray","lightblue","blue","darkblue","black")
+    # Labels = c("<= 30000","<= 40000","<= 50000","<= 70000","> 70000")
+    # 
+    # leaflet(tmp)%>%addProviderTiles("Esri.WorldStreetMap")%>%
+    #   addAwesomeMarkers(~lon, ~lat, icon=icons, label=~as.character(A_MEAN))%>%  
+    #   setView(lng=-30,lat=28,zoom=2)%>%#put US in the centre
+    #   addLegend("topright", colors = Colors, labels = Labels,
+    #             title = "Wage Level<br/>From Low to High",
+    #             labFormat = labelFormat(prefix = "$"),
+    #             opacity = 1)
     
-    #  output$click_gdp_trend<- renderPlotly({
-      #     df <- as.data.frame(t(gdp.aer.rpp)[1:4,])
-      #     colnames(df) <- gdp.aer.rpp[,1]
-      #     df <- df[-1,]
-      #      plot.df <- data.frame(year=2014:2016,gdp=df[,state_name])
-      #      plot_ly(x=plot.df$year,y=plot.df$gdp, type='scatter', mode = 'lines') %>%
-        #       layout(xaxis=list(title="Years",tickfont=list(size=9)),
-               #               yaxis=list(title="GDP",tickfont=list(size=9)))
-      #    })
-#  })
+    
+  })
+  # End leaflet
+  
+  # State info Detail
+  output$map <- renderPlot({
+    plotMap
+    # coord_map(), do not use it. More discussion next section.
+  })
+  output$info <- renderPlot({
+    plotInfo
+  })
+  
+  # plot after click
+  observeEvent(input$clickMap, {
+    xClick <- input$clickMap$x
+    yClick <- input$clickMap$y
+    state <- which_state(usaMap, xClick, yClick)
+    output$map <- renderPlot(
+      plotMap + 
+        geom_polygon(data = usaMap[usaMap$region == state,], fill = "yellow") +
+        annotate("text", x = xClick, y = yClick, label = state, color = "red")
+    )
+    output$info <- renderPlot({
+      plotInfo +
+        geom_point(data = si[tolower(si$STATE) == state,],
+                   size = 6, shape = 1, color = "red")
+    })
+  })
+  
+  # End State info Detail
+  
   
 }
 ## end 2D map

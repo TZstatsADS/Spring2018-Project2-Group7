@@ -6,15 +6,13 @@ library("shiny")
 library("ggmap")
 library("ggplot2")
 library("maps")
-library("plotly")
+
 
 
 data <- read.csv("state_M2016.csv",header = TRUE,stringsAsFactors = FALSE)
 data.Alabama <- data[data$STATE=="Alabama",]
 major <- as.character(data.Alabama[data.Alabama$OCC_GROUP=="major","OCC_TITLE"])
 data.Alabama$first2 <- substr(data.Alabama$OCC_CODE, 1, 2)
-
-
 
 return_detail_given_major <- function(major_str){
   first2_code <- data.Alabama[data.Alabama$OCC_TITLE==major_str, "first2"]
@@ -24,11 +22,13 @@ return_detail_given_major <- function(major_str){
 
 detail_list <- sapply(major, return_detail_given_major)
 
-
+si <- read.csv("State_info.csv", header = T, stringsAsFactors = F)
+usaMap <- map_data("state")
 
 
 ui<- navbarPage(
   
+
   ##link to css.file
   theme = "bootstrap2.css",
   
@@ -57,9 +57,6 @@ ui<- navbarPage(
              width = 350, height = "auto",
              h2("Job Search"),
              
-             
-             
-             
              selectizeInput(inputId = "occupation",
                             label  = "Select the Occupations",
                             choices = detail_list,
@@ -70,23 +67,28 @@ ui<- navbarPage(
              radioButtons(inputId = "crime_climate",
                           label  = "Display Crime/Climate",
                           choices = c('Crime','Climate'),
-                          selected ='Crime')
+                          selected ='Crime'),
+             p(textOutput("state_name"))
              
              
-           )#,
-         #  absolutePanel(id = "controls", class = "panel panel-default", fixed= TRUE, draggable = TRUE,
-      #                   top = 120, left = "auto", right = 20, bottom = "auto", width = 320, height = "auto",
-      #                   h2("Related Info"),
-      #                   br(),
-     #                    p(textOutput("pclick")),
-      #                   h3("State:"),
-      #                   p(strong(textOutput("state_name"))),
-      #                   br(),
-      #                   h3(strong("GDP Trend:")),
-       #                  plotlyOutput("click_gdp_trend", height="150") #click_complaint_timedist
-      #     )
+           )
            
-  )
+  ),
+  
+  
+  
+  tabPanel("State Info Detail",
+           titlePanel("State Info Detail"),
+           column(
+             width = 6,
+             plotOutput("map", click = "clickMap", width = 430, height = 275)
+           ),
+           column(
+             width = 6,
+             plotOutput("info", width = 430, height = 275)
+           )
+           )
+  
 )
 
 
