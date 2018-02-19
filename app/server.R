@@ -180,9 +180,9 @@ server<- function(input, output, session){
              yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
   })
   
-  dt.data <- as.data.frame(tmp[,c(3,5,6)])
-  aer.rpp_2016 <- gdp.aer.rpp[,c("Area","AER_2016","RPPs_Goods_2016","RPPs_Rents_2016")]
-  colnames(aer.rpp_2016) <- c("STATE","AER","RPP_GOODS","RPP_RENTS")
+  #dt.data <- as.data.frame(tmp[,c(3,5,6)])
+  #aer.rpp_2016 <- gdp.aer.rpp[,c("Area","AER_2016","RPPs_Goods_2016","RPPs_Rents_2016")]
+  #colnames(aer.rpp_2016) <- c("STATE","AER","RPP_GOODS","RPP_RENTS")
   
   # End leaflet
   
