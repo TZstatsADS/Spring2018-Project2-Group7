@@ -36,6 +36,7 @@ which_state <- function(mapData, long, lat) {
   rangeAngle <- tapply(mapData$angle, mapData$region, function(x) max(x) - min(x))
   return(names(sort(rangeAngle, decreasing = TRUE))[1])
 }
+usaMap <- map_data("state")
 plotMap <- ggplot(usaMap, aes(x = long, y = lat, group = group)) + 
   geom_polygon(fill = "white", color = "black")
 plotInfo <- ggplot(si, aes(x = Rent_Price, y = Price_Level)) + 
@@ -102,7 +103,7 @@ server<- function(input, output, session){
                                    padding = "3px 8px"),
                       textsize = "15px",
                       direction = "auto")) %>%
-        addLegend("bottomright", pal = pal, values = ~tmp$A_MEAN,
+        addLegend("bottomleft", pal = pal, values = ~tmp$A_MEAN,
                   title = "Salary Level",
                   labFormat = labelFormat(prefix = "$"),
                   opacity = 1)
@@ -148,6 +149,41 @@ server<- function(input, output, session){
     
     
   })
+  
+  output$state_name <- renderText(input$state_selection)
+  
+  output$click_gdp_trend<- renderPlotly({
+    df <- as.data.frame(t(gdp.aer.rpp)[1:4,])
+    colnames(df) <- gdp.aer.rpp[,1]
+    df <- df[-1,]
+    plot.df <- data.frame(year=2014:2016,gdp=df[,input$state_selection])
+    plot_ly(x=plot.df$year,y=plot.df$gdp, type='scatter', mode = 'lines') %>%
+      layout(xaxis=list(title="Years",tickfont=list(size=9)),
+             yaxis=list(title="GDP",tickfont=list(size=9)))
+  })
+  
+  output$click_amusement_pie<- renderPlotly({
+    df <- as.data.frame(t(gdp.aer.rpp)[c(1,7),])
+    colnames(df) <- gdp.aer.rpp[,1]
+    df <- df[-1,]
+    plot.df <- data.frame(year=2016,aer=df[,input$state_selection])
+    plot.df$aer <- as.character(plot.df$aer)
+    plot.df$aer <- as.numeric(substr(plot.df$aer,1,nchar(plot.df$aer)-1))
+    plot.df$uaer <- 100-plot.df$aer
+    plot.df[2,] <- c("YEAR","AER","UAER")
+    plot.df <- t(plot.df)
+    plot.df <- plot.df[-1,]
+    plot.df[,1] <- as.numeric(as.character(plot.df[,1]))/100
+    plot.df <- as.data.frame(plot.df)
+    plot_ly(data=plot.df,values = ~plot.df[,1],labels = ~plot.df[,2], type='pie') %>%
+      layout(xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+             yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+  })
+  
+  dt.data <- as.data.frame(tmp[,c(3,5,6)])
+  aer.rpp_2016 <- gdp.aer.rpp[,c("Area","AER_2016","RPPs_Goods_2016","RPPs_Rents_2016")]
+  colnames(aer.rpp_2016) <- c("STATE","AER","RPP_GOODS","RPP_RENTS")
+  
   # End leaflet
   
   # State info Detail

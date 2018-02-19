@@ -22,6 +22,9 @@ return_detail_given_major <- function(major_str){
 
 detail_list <- sapply(major, return_detail_given_major)
 
+data.state <- read.csv("state_coordinate.csv",header = TRUE,stringsAsFactors = FALSE)
+state_list <- data.state$STATE
+
 si <- read.csv("State_info.csv", header = T, stringsAsFactors = F)
 usaMap <- map_data("state")
 
@@ -61,17 +64,23 @@ ui<- navbarPage(
                             label  = "Select the Occupations",
                             choices = detail_list,
                             selected ='Management Occupations'),
+            
+             selectizeInput(inputId = "state_selection",
+                            label  = "Select the State",
+                            choices = state_list,
+                            selected ='New York')
+           ),
              
-             
-             
-             radioButtons(inputId = "crime_climate",
-                          label  = "Display Crime/Climate",
-                          choices = c('Crime','Climate'),
-                          selected ='Crime'),
-             p(textOutput("state_name"))
-             
-             
-           )
+           absolutePanel(id = "controls", class = "panel panel-default", fixed= FALSE, draggable = TRUE,
+                         top = 120, left = "auto", right = 20, bottom = "auto", width = 320, height = "auto",
+                         h2("State Overview"),
+                         p(strong("State:"),strong(textOutput("state_name"))),
+                         h3(strong("GDP Trend:")),
+                         plotlyOutput("click_gdp_trend", height="150"), #click_complaint_timedist
+                         h3(strong("% of AER in All Industry:")), # "Percentage of Arts, entertainment, recreation, accommodation, and food services in All industry"
+                         plotlyOutput("click_amusement_pie",height="200"),
+                         p("% of Arts, entertainment, recreation, accommodation, and food services in All industry in 2016")
+           )  
            
   ),
   
