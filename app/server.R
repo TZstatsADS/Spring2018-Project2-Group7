@@ -59,46 +59,46 @@ server<- function(input, output, session){
   })
   
   ## Part 1
- 
   
   
   
+  
+  
+  output$Plot <- renderPlotly({
     
-    output$Plot <- renderPlotly({
-      
-      df1<-data.frame(Occupation=rep(national[input$major1,1],each=3),
-                      Year=c(2012,2013,2014),
-                      Annual_Wage=unlist(national[input$major1,2:4]))
-      df2<-data.frame(Occupation=rep(national[input$major2,1],each=3),
-                      Year=c(2012,2013,2014),
-                      Annual_Wage=unlist(national[input$major2,2:4]))
-      df3<-data.frame(Occupation=rep(national[input$major3,1],each=3),
-                      Year=c(2012,2013,2014),
-                      Annual_Wage=unlist(national[input$major3,2:4]))
-      df<-rbind(df1,df2,df3)
-      
-      p<-ggplot(data=df, aes(x=Year, y=Annual_Wage, fill=Occupation)) +
-        geom_bar(stat="identity",position=position_dodge())+
-        scale_fill_brewer(palette="Blues")+
-        theme_minimal()
-      gg<-ggplotly(p)
-      layout(gg, dragmode = "pan")
-      
-    })
+    df1<-data.frame(Occupation=rep(national[input$major1,1],each=3),
+                    Year=c(2012,2013,2014),
+                    Annual_Wage=unlist(national[input$major1,2:4]))
+    df2<-data.frame(Occupation=rep(national[input$major2,1],each=3),
+                    Year=c(2012,2013,2014),
+                    Annual_Wage=unlist(national[input$major2,2:4]))
+    df3<-data.frame(Occupation=rep(national[input$major3,1],each=3),
+                    Year=c(2012,2013,2014),
+                    Annual_Wage=unlist(national[input$major3,2:4]))
+    df<-rbind(df1,df2,df3)
     
-    output$table <- DT::renderDataTable(DT::datatable({
-      
-      if (input$state != "All") {
-        data2 <- data2[data2$State == input$state,]
-      }
-      if (input$major != 00) {
-        data2 <- data2[substr(data2$OCC_CODE,start = 1,stop = 2) == input$major,]
-      }
-      
-      data2<-data2[,-2]
-      data2
-    }))
+    p<-ggplot(data=df, aes(x=Year, y=Annual_Wage, fill=Occupation)) +
+      geom_bar(stat="identity",position=position_dodge())+
+      scale_fill_brewer(palette="Blues")+
+      theme_minimal()
+    gg<-ggplotly(p)
+    layout(gg, dragmode = "pan")
     
+  })
+  
+  output$table <- DT::renderDataTable(DT::datatable({
+    
+    if (input$state != "All") {
+      data2 <- data2[data2$State == input$state,]
+    }
+    if (input$major != 00) {
+      data2 <- data2[substr(data2$OCC_CODE,start = 1,stop = 2) == input$major,]
+    }
+    
+    data2<-data2[,-2]
+    data2
+  }))
+  
   
   
   ## Part 2
@@ -108,7 +108,7 @@ server<- function(input, output, session){
   
   output$usmap <- renderLeaflet({
     
-    tmp <- data
+    # tmp.ordered <- subset(data, OCC_TITLE == "Management Occupations")
     tmp<-subset(data,OCC_TITLE == as.character(input$occupation))
     
     mapStates = map("state", fill = TRUE, plot = FALSE)
@@ -117,6 +117,7 @@ server<- function(input, output, session){
     colnames(state.shortname) <- "state.shortname"
     tmp$state.shortname <- substr(tolower(tmp$STATE), 1, 8)
     tmp.ordered <- merge(state.shortname, tmp, by="state.shortname", all.x = T)
+    # new <- cbind(mapStates$names, tmp.ordered)
     
     if(nrow(tmp)>0){
       pal <- colorNumeric(palette="YlGnBu", domain=tmp.ordered$A_MEAN)
@@ -136,7 +137,6 @@ server<- function(input, output, session){
                     color = "white",
                     dashArray = "3",
                     fillOpacity = 0.7,
-                    layerId = ~tmp.ordered$STATE,
                     highlight = highlightOptions(
                       weight = 5,
                       color = "#666",
@@ -149,7 +149,7 @@ server<- function(input, output, session){
                                    padding = "3px 8px"),
                       textsize = "15px",
                       direction = "auto")) %>%
-        addLegend("bottomleft", pal = pal, values = ~tmp$A_MEAN,
+        addLegend("bottomleft", pal = pal, values = ~tmp.ordered$A_MEAN,
                   title = "Salary Level",
                   labFormat = labelFormat(prefix = "$"),
                   opacity = 1)

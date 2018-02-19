@@ -57,3 +57,16 @@ df5 <- merge(df3, df4, by = "STATE", all.x = T)
 write.csv(df5, "State_Info.csv")
 ```
 
+
+```{r}
+data <- read.csv("salary2016.csv", header = T, stringsAsFactors = F)
+
+data[data$STATE=="New York", "A_MEAN"]
+remove.na <- (1:nrow(data))[is.na(data$A_MEAN)]
+new.data <- data[-remove.na,]
+
+write.csv(new.data, "salary2016.csv")
+
+```
+
+
