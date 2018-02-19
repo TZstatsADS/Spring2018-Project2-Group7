@@ -45,7 +45,140 @@ ui<- navbarPage(
            htmlOutput("teammates")
   ),
   
+  tabPanel("Choose Your Major",titlePanel("Choose Your Major"),
+           
+           sidebarLayout(      
+             
+             sidebarPanel(
+               selectInput("major1", "Major 1:", 
+                           choices=list("Management Occupations" = 1, 
+                                        "Business and Financial Operations Occupations" = 2, 
+                                        "Computer and Mathematical Occupations" = 3,
+                                        "Architecture and Engineering Occupations" = 4,
+                                        "Life, Physical, and Social Science Occupations" = 5,
+                                        "Community and Social Service Occupations" = 6,
+                                        "Legal Occupations" = 7,
+                                        "Education, Training, and Library Occupations" = 8,
+                                        "Arts, Design, Entertainment, Sports, and Media Occupations" = 9,
+                                        "Healthcare Practitioners and Technical Occupations" = 10,
+                                        "Healthcare Support Occupations" = 11,
+                                        "Protective Service Occupations" = 12,
+                                        "Food Preparation and Serving Related Occupations" = 13,
+                                        "Building and Grounds Cleaning and Maintenance Occupations" = 14,
+                                        "Personal Care and Service Occupations" = 15,
+                                        "Sales and Related Occupations" = 16,
+                                        "Office and Administrative Support Occupations" = 17,
+                                        "Farming, Fishing, and Forestry Occupations" = 18,
+                                        "Construction and Extraction Occupations" = 19,
+                                        "Installation, Maintenance, and Repair Occupations" = 20,
+                                        "Production Occupations" = 21,
+                                        "Transportation and Material Moving Occupations" = 22
+                           ),selected = 1),
+               selectInput("major2", "Major 2:", 
+                           choices=list("Management Occupations" = 1, 
+                                        "Business and Financial Operations Occupations" = 2, 
+                                        "Computer and Mathematical Occupations" = 3,
+                                        "Architecture and Engineering Occupations" = 4,
+                                        "Life, Physical, and Social Science Occupations" = 5,
+                                        "Community and Social Service Occupations" = 6,
+                                        "Legal Occupations" = 7,
+                                        "Education, Training, and Library Occupations" = 8,
+                                        "Arts, Design, Entertainment, Sports, and Media Occupations" = 9,
+                                        "Healthcare Practitioners and Technical Occupations" = 10,
+                                        "Healthcare Support Occupations" = 11,
+                                        "Protective Service Occupations" = 12,
+                                        "Food Preparation and Serving Related Occupations" = 13,
+                                        "Building and Grounds Cleaning and Maintenance Occupations" = 14,
+                                        "Personal Care and Service Occupations" = 15,
+                                        "Sales and Related Occupations" = 16,
+                                        "Office and Administrative Support Occupations" = 17,
+                                        "Farming, Fishing, and Forestry Occupations" = 18,
+                                        "Construction and Extraction Occupations" = 19,
+                                        "Installation, Maintenance, and Repair Occupations" = 20,
+                                        "Production Occupations" = 21,
+                                        "Transportation and Material Moving Occupations" = 22
+                           ),selected = 1),
+               selectInput("major3", "Major 3:", 
+                           choices=list("Management Occupations" = 1, 
+                                        "Business and Financial Operations Occupations" = 2, 
+                                        "Computer and Mathematical Occupations" = 3,
+                                        "Architecture and Engineering Occupations" = 4,
+                                        "Life, Physical, and Social Science Occupations" = 5,
+                                        "Community and Social Service Occupations" = 6,
+                                        "Legal Occupations" = 7,
+                                        "Education, Training, and Library Occupations" = 8,
+                                        "Arts, Design, Entertainment, Sports, and Media Occupations" = 9,
+                                        "Healthcare Practitioners and Technical Occupations" = 10,
+                                        "Healthcare Support Occupations" = 11,
+                                        "Protective Service Occupations" = 12,
+                                        "Food Preparation and Serving Related Occupations" = 13,
+                                        "Building and Grounds Cleaning and Maintenance Occupations" = 14,
+                                        "Personal Care and Service Occupations" = 15,
+                                        "Sales and Related Occupations" = 16,
+                                        "Office and Administrative Support Occupations" = 17,
+                                        "Farming, Fishing, and Forestry Occupations" = 18,
+                                        "Construction and Extraction Occupations" = 19,
+                                        "Installation, Maintenance, and Repair Occupations" = 20,
+                                        "Production Occupations" = 21,
+                                        "Transportation and Material Moving Occupations" = 22
+                           ),selected = 1),
+               hr(),
+               
+               helpText("Data from Bureau of Labor Statistics: https://www.bls.gov/")
+             ),
+             
+             # Create a spot for the barplot
+             mainPanel(
+               plotlyOutput("Plot")  
+             )
+             
+           )),
   
+  tabPanel("Basic Wage Info",titlePanel("Basic Wage Information"),
+           
+           
+           fluidRow(
+             column(4,
+                    selectInput("state",
+                                "State:",
+                                c("All",
+                                  unique(as.character(data$State))))
+             ),
+             column(4,
+                    selectInput("major",
+                                "Major:",
+                                choices=list("All" = 00,
+                                             "Management Occupations" = 11, 
+                                             "Business and Financial Operations Occupations" = 13, 
+                                             "Computer and Mathematical Occupations" = 15,
+                                             "Architecture and Engineering Occupations" = 17,
+                                             "Life, Physical, and Social Science Occupations" = 19,
+                                             "Community and Social Service Occupations" = 21,
+                                             "Legal Occupations" = 23,
+                                             "Education, Training, and Library Occupations" = 25,
+                                             "Arts, Design, Entertainment, Sports, and Media Occupations" = 27,
+                                             "Healthcare Practitioners and Technical Occupations" = 29,
+                                             "Healthcare Support Occupations" = 31,
+                                             "Protective Service Occupations" = 33,
+                                             "Food Preparation and Serving Related Occupations" = 35,
+                                             "Building and Grounds Cleaning and Maintenance Occupations" = 37,
+                                             "Personal Care and Service Occupations" = 39,
+                                             "Sales and Related Occupations" = 41,
+                                             "Office and Administrative Support Occupations" = 43,
+                                             "Farming, Fishing, and Forestry Occupations" = 45,
+                                             "Construction and Extraction Occupations" = 47,
+                                             "Installation, Maintenance, and Repair Occupations" = 49,
+                                             "Production Occupations" = 51,
+                                             "Transportation and Material Moving Occupations" = 53)
+                                
+                    )
+                    
+             ),
+             
+             fluidRow(
+               DT::dataTableOutput("table")
+             )
+           )),
   
   ## Find Your Location
   tabPanel("Find Your Location",

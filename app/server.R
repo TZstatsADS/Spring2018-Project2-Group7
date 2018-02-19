@@ -16,10 +16,12 @@ library("ggplot2")
 library("maps")
 library("RColorBrewer")
 library("plotly")
-
+library("DT")
 
 data <- read.csv("salary2016.csv",header = TRUE,stringsAsFactors = FALSE)
 gdp.aer.rpp <- read.csv("GDP_AER_RPP.csv",header = TRUE,stringsAsFactors = FALSE)
+national<-read.csv("national.csv",header = T)
+data2<-read.csv("state_M2016_2.csv",header = T)
 
 si <- read.csv("State_info.csv", header = T, stringsAsFactors = F)
 which_state <- function(mapData, long, lat) {
@@ -55,6 +57,48 @@ server<- function(input, output, session){
     HTML("<br/><br/><br/>Our project uses statistics provided by the Department of Labor <br/>
          to help with future career choices")
   })
+  
+  ## Part 1
+ 
+  
+  
+  
+    
+    output$Plot <- renderPlotly({
+      
+      df1<-data.frame(Occupation=rep(national[input$major1,1],each=3),
+                      Year=c(2012,2013,2014),
+                      Annual_Wage=unlist(national[input$major1,2:4]))
+      df2<-data.frame(Occupation=rep(national[input$major2,1],each=3),
+                      Year=c(2012,2013,2014),
+                      Annual_Wage=unlist(national[input$major2,2:4]))
+      df3<-data.frame(Occupation=rep(national[input$major3,1],each=3),
+                      Year=c(2012,2013,2014),
+                      Annual_Wage=unlist(national[input$major3,2:4]))
+      df<-rbind(df1,df2,df3)
+      
+      p<-ggplot(data=df, aes(x=Year, y=Annual_Wage, fill=Occupation)) +
+        geom_bar(stat="identity",position=position_dodge())+
+        scale_fill_brewer(palette="Blues")+
+        theme_minimal()
+      gg<-ggplotly(p)
+      layout(gg, dragmode = "pan")
+      
+    })
+    
+    output$table <- DT::renderDataTable(DT::datatable({
+      
+      if (input$state != "All") {
+        data2 <- data2[data2$State == input$state,]
+      }
+      if (input$major != 00) {
+        data2 <- data2[substr(data2$OCC_CODE,start = 1,stop = 2) == input$major,]
+      }
+      
+      data2<-data2[,-2]
+      data2
+    }))
+    
   
   
   ## Part 2
