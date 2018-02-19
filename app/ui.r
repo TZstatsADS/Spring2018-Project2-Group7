@@ -7,7 +7,7 @@ library("ggmap")
 library("ggplot2")
 library("maps")
 library("plotly")
-
+library("DT")
 
 data <- read.csv("state_M2016.csv",header = TRUE,stringsAsFactors = FALSE)
 data.Alabama <- data[data$STATE=="Alabama",]
@@ -28,6 +28,7 @@ state_list <- data.state$STATE
 si <- read.csv("State_info.csv", header = T, stringsAsFactors = F)
 usaMap <- map_data("state")
 
+preference_list <- c("Salary","Crime_Rate","Cleardays","Recreation_Level","Rent_Price","Price_Level")
 
 ui<- navbarPage(
   
@@ -228,10 +229,38 @@ ui<- navbarPage(
            column(
              width = 6,
              plotOutput("info", width = 430, height = 275)
+           ),
+           
+           
+           #Give a Recommandation
+           titlePanel("Give a Recommandation"),
+           
+           fluidRow(
+             column(2,
+                    h4("Select Your Preference"),
+                    selectizeInput(inputId = "firstpreference",
+                                   label  = "First Preference",
+                                   choices = preference_list,
+                                   selected ='Salary'),
+                    
+                    selectizeInput(inputId = "secondpreference",
+                                   label  = "Second Preference",
+                                   choices = preference_list,
+                                   selected ='Crime_Rate'),
+                    
+                    selectizeInput(inputId = "thirdpreference",
+                                   label  = "Third Preference",
+                                   choices = preference_list,
+                                   selected ='Cleardays'),
+                    column(10,
+                           DT::dataTableOutput("recommandationtable")
+                    )
+             )
            )
-           )
-  
+           
+  )
 )
+          
 
 
 
