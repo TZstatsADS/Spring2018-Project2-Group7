@@ -6,7 +6,7 @@ library("shiny")
 library("ggmap")
 library("ggplot2")
 library("maps")
-
+library("plotly")
 
 
 data <- read.csv("state_M2016.csv",header = TRUE,stringsAsFactors = FALSE)

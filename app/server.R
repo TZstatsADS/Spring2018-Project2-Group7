@@ -15,9 +15,11 @@ library("ggmap")
 library("ggplot2")
 library("maps")
 library("RColorBrewer")
+library("plotly")
 
 
 data <- read.csv("salary2016.csv",header = TRUE,stringsAsFactors = FALSE)
+gdp.aer.rpp <- read.csv("GDP_AER_RPP.csv",header = TRUE,stringsAsFactors = FALSE)
 
 si <- read.csv("State_info.csv", header = T, stringsAsFactors = F)
 which_state <- function(mapData, long, lat) {
