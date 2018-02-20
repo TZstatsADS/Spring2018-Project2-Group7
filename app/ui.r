@@ -13,6 +13,7 @@ data <- read.csv("state_M2016.csv",header = TRUE,stringsAsFactors = FALSE)
 data.Alabama <- data[data$STATE=="Alabama",]
 major <- as.character(data.Alabama[data.Alabama$OCC_GROUP=="major","OCC_TITLE"])
 data.Alabama$first2 <- substr(data.Alabama$OCC_CODE, 1, 2)
+data2<-read.csv("state_M2016_2.csv",header = T)
 
 return_detail_given_major <- function(major_str){
   first2_code <- data.Alabama[data.Alabama$OCC_TITLE==major_str, "first2"]
@@ -143,7 +144,7 @@ ui<- navbarPage(
                     selectInput("state",
                                 "State:",
                                 c("All",
-                                  unique(as.character(data$State))))
+                                  unique(as.character(data2$State))))
              ),
              column(4,
                     selectInput("major",
