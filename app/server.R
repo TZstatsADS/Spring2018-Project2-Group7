@@ -17,6 +17,8 @@ library("maps")
 library("RColorBrewer")
 library("plotly")
 library("DT")
+library("scales")
+library("dplyr")
 
 data <- read.csv("salary2016.csv",header = TRUE,stringsAsFactors = FALSE)
 gdp.aer.rpp <- read.csv("GDP_AER_RPP.csv",header = TRUE,stringsAsFactors = FALSE)
@@ -226,9 +228,46 @@ server<- function(input, output, session){
              yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
   })
   
-  #dt.data <- as.data.frame(tmp[,c(3,5,6)])
-  #aer.rpp_2016 <- gdp.aer.rpp[,c("Area","AER_2016","RPPs_Goods_2016","RPPs_Rents_2016")]
-  #colnames(aer.rpp_2016) <- c("STATE","AER","RPP_GOODS","RPP_RENTS")
+  output$recommandationtable<-renderDataTable({
+    # Data preparation
+    tmp<-subset(data,OCC_TITLE == as.character(input$occupation))
+    dt.data.1 <- as.data.frame(tmp[,c(5,6,8)])
+    aer.rpp_2016 <- gdp.aer.rpp[,c("Area","AER_2016","RPPs_Goods_2016","RPPs_Rents_2016")]
+    colnames(aer.rpp_2016) <- c("STATE","AER","RPP_GOODS","RPP_RENTS")
+    dt.data.2 <- merge(dt.data.1,aer.rpp_2016,by = "STATE")
+    si2 <- si[,c(2,3,6)]
+    si2$STATE <- tolower(si2$STATE)
+    dt.data.2$STATE <- tolower(dt.data.2$STATE)
+    dt.data <- merge(dt.data.2,si2,by = "STATE")
+    colname.data <- colnames(dt.data)
+    dt.data$AER <- as.character(dt.data$AER)
+    dt.data$AER <- as.numeric(substr(dt.data$AER,1,nchar(dt.data$AER)-1))
+    dt.data[,3:8] <- apply(dt.data[,3:8], 2, as.numeric)
+    dt.data.scale <- dt.data[,1:2]
+    dt.data.scale[,3:8] <- apply(dt.data[,3:8], 2, rescale)
+    colnames(dt.data.scale) <- c("STATE","Title","Salary","AER","RPP Price","RPP Rents","Crime Rate","Cleardays")
+    dt.data.scale[,c(5,6,7)] <- (dt.data.scale[,c(5,6,7)])*(-1)
+    
+    # Assign the input value
+    select1<-as.character(input$firstpreference)
+    select2<-as.character(input$secondpreference)
+    select3<-as.character(input$thirdpreference)
+    
+    # Rank calculation 
+    dt.data.scale<-as.data.frame(dt.data.scale)
+    dt.data.scale$score<- 0.5*dt.data.scale[,select1]+0.3*dt.data.scale[,select2]+0.2*dt.data.scale[,select3]
+    ??order
+    order.score<-order(-dt.data.scale$score)
+    dt.data.scale$TotalRank[order.score] <- 1:nrow(dt.data.scale)
+    
+    #sort table 
+    dt.data.scale<-dt.data.scale[order(dt.data.scale$TotalRank),]
+    
+    dt.data.scale<-dt.data.scale %>%
+      dplyr::select(TotalRank,select1,select2,select3,everything()) %>%
+      dplyr::select(-score)
+    
+  })
   
   # End leaflet
   

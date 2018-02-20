@@ -29,7 +29,7 @@ state_list <- data.state$STATE
 si <- read.csv("State_info.csv", header = T, stringsAsFactors = F)
 usaMap <- map_data("state")
 
-preference_list <- c("Salary","Crime_Rate","Cleardays","Recreation_Level","Rent_Price","Price_Level")
+preference_list <- c("Salary","Crime Rate","Cleardays","AER","RPP Rents","RPP Price")
 
 ui<- navbarPage(
   
@@ -225,11 +225,11 @@ ui<- navbarPage(
            titlePanel("State Info Detail"),
            column(
              width = 6,
-             plotOutput("map", click = "clickMap", width = 430, height = 275)
+             plotOutput("map", click = "clickMap", width = 500, height = 350)
            ),
            column(
              width = 6,
-             plotOutput("info", width = 430, height = 275)
+             plotOutput("info", width = 500, height = 350)
            ),
            
            
@@ -247,7 +247,7 @@ ui<- navbarPage(
                     selectizeInput(inputId = "secondpreference",
                                    label  = "Second Preference",
                                    choices = preference_list,
-                                   selected ='Crime_Rate'),
+                                   selected ='Crime Rate'),
                     
                     selectizeInput(inputId = "thirdpreference",
                                    label  = "Third Preference",
