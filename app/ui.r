@@ -169,10 +169,10 @@ ui<- navbarPage(
   
   
   
-  # Your Recommandation Panel
+  # Your Recommendation Panel
   # Let the user to choose three preferences and give them location (state)
   # recommendation under their preference.
-  tabPanel("Your Recommandation",
+  tabPanel("Your Recommendation",
            titlePanel("State Info Detail"),
            column(
              width = 6,
@@ -183,8 +183,8 @@ ui<- navbarPage(
              plotOutput("info", width = 500, height = 350)
            ),
            
-           #Give a Recommandation
-           titlePanel("Your Recommandation"),
+           #Give a Recommendation
+           titlePanel("Your Recommendation"),
            
            fluidRow(
              #select your preference
