@@ -1,0 +1,72 @@
+---
+title: "Data_cleaning"
+author: "Wenshan Wang"
+date: "2/14/2018"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+data <- read.csv("state_M2016.csv",header = TRUE,stringsAsFactors = FALSE)
+state.coordinate <- read.csv("state_coordinate.csv",header = TRUE,stringsAsFactors = FALSE)
+df = merge(data,state.coordinate, by = "STATE", all.x=T)
+df = df[,c("ST","STATE","OCC_TITLE","OCC_GROUP","A_MEAN","lon","lat")]
+```
+
+```{r}
+df$A_MEAN <- as.numeric(gsub(",", "", df$A_MEAN))
+write.csv(df, "salary2016.csv")
+```
+
+```{r}
+data <- read.csv("state_M2016.csv",header = TRUE,stringsAsFactors = FALSE)
+data <- data[, c("ST","STATE","OCC_CODE","OCC_TITLE","OCC_GROUP","A_MEAN")]
+data$A_MEAN <- as.numeric(gsub(",", "", data$A_MEAN))
+```
+
+```{r}
+occ_code_fac <- as.factor(data$OCC_CODE)
+occ_code_unique <- levels(occ_code_fac)
+
+first2 <- substr(data$OCC_CODE, 1, 2)
+
+length(data$ST=="AL")
+
+```
+
+
+```{r}
+df1 <- read.csv("GDP_AER_RPP.csv", header = T, stringsAsFactors = F)
+df1 <- df1[,c("Area", "RPPs_Goods_2016", "RPPs_Rents_2016")]
+df1$Area <- toupper(df1$Area)
+colnames(df1) <- c("STATE", "Price_Level", "Rent_Price")
+
+df2 <- read.csv("crime rate 2016.csv", header = T, stringsAsFactors = F)
+colnames(df2) <- c("STATE", "Crime_Rate")
+
+df3 <- merge(df2, df1, by = "STATE", all.x = T)
+
+df4 <- read.csv("sunnydays.csv", header = T, stringsAsFactors = F)
+df4$STATE <- toupper(df4$STATE)
+
+df5 <- merge(df3, df4, by = "STATE", all.x = T)
+
+write.csv(df5, "State_Info.csv")
+```
+
+
+```{r}
+data <- read.csv("salary2016.csv", header = T, stringsAsFactors = F)
+
+data[data$STATE=="New York", "A_MEAN"]
+remove.na <- (1:nrow(data))[is.na(data$A_MEAN)]
+new.data <- data[-remove.na,]
+
+write.csv(new.data, "salary2016.csv")
+
+```
+
+
