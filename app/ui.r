@@ -198,12 +198,12 @@ ui<- navbarPage(
              selectizeInput(inputId = "occupation",
                             label  = "Select the Occupations",
                             choices = detail_list,
-                            selected ='Management Occupations'),
+                            selected ='Management Occupations')
             
-             selectizeInput(inputId = "state_selection",
-                            label  = "Select the State",
-                            choices = state_list,
-                            selected ='New York')
+             # selectizeInput(inputId = "state_selection",
+             #                label  = "Select the State",
+             #                choices = state_list,
+             #                selected ='New York')
            ),
              
            absolutePanel(id = "controls", class = "panel panel-default", fixed= FALSE, draggable = TRUE,

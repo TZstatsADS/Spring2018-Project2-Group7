@@ -7,7 +7,6 @@
 #    http://shiny.rstudio.com/
 #
 #load the packages
-# install.packages("varhandle")
 library("varhandle")
 library("leaflet")
 library("shiny")
@@ -61,9 +60,6 @@ server<- function(input, output, session){
   })
   
   ## Part 1
-  
-  
-  
   
   
   output$Plot <- renderPlotly({
@@ -121,7 +117,7 @@ server<- function(input, output, session){
     tmp.ordered <- merge(state.shortname, tmp, by="state.shortname", all.x = T)
     # new <- cbind(mapStates$names, tmp.ordered)
     
-    if(nrow(tmp)>0){
+    if(nrow(tmp.ordered)>0){
       pal <- colorNumeric(palette="YlGnBu", domain=tmp.ordered$A_MEAN)
       
       labels <- sprintf(
@@ -139,6 +135,7 @@ server<- function(input, output, session){
                     color = "white",
                     dashArray = "3",
                     fillOpacity = 0.7,
+                    layerId = ~tmp.ordered$STATE,
                     highlight = highlightOptions(
                       weight = 5,
                       color = "#666",
@@ -198,34 +195,38 @@ server<- function(input, output, session){
     
   })
   
-  output$state_name <- renderText(input$state_selection)
-  
-  output$click_gdp_trend<- renderPlotly({
-    df <- as.data.frame(t(gdp.aer.rpp)[1:4,])
-    colnames(df) <- gdp.aer.rpp[,1]
-    df <- df[-1,]
-    plot.df <- data.frame(year=2014:2016,gdp=df[,input$state_selection])
-    plot_ly(x=plot.df$year,y=plot.df$gdp, type='scatter', mode = 'lines') %>%
-      layout(xaxis=list(title="Years",tickfont=list(size=9)),
-             yaxis=list(title="GDP",tickfont=list(size=9)))
-  })
-  
-  output$click_amusement_pie<- renderPlotly({
-    df <- as.data.frame(t(gdp.aer.rpp)[c(1,7),])
-    colnames(df) <- gdp.aer.rpp[,1]
-    df <- df[-1,]
-    plot.df <- data.frame(year=2016,aer=df[,input$state_selection])
-    plot.df$aer <- as.character(plot.df$aer)
-    plot.df$aer <- as.numeric(substr(plot.df$aer,1,nchar(plot.df$aer)-1))
-    plot.df$uaer <- 100-plot.df$aer
-    plot.df[2,] <- c("YEAR","AER","UAER")
-    plot.df <- t(plot.df)
-    plot.df <- plot.df[-1,]
-    plot.df[,1] <- as.numeric(as.character(plot.df[,1]))/100
-    plot.df <- as.data.frame(plot.df)
-    plot_ly(data=plot.df,values = ~plot.df[,1],labels = ~plot.df[,2], type='pie') %>%
-      layout(xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
-             yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+  observeEvent(input$usmap_shape_click, {
+    click <- input$usmap_shape_click
+    
+    output$state_name <- renderText(click$id)
+    
+    output$click_gdp_trend<- renderPlotly({
+      df <- as.data.frame(t(gdp.aer.rpp)[1:4,])
+      colnames(df) <- gdp.aer.rpp[,1]
+      df <- df[-1,]
+      plot.df <- data.frame(year=2014:2016,gdp=df[,click$id])
+      plot_ly(x=plot.df$year,y=plot.df$gdp, type='scatter', mode = 'lines') %>%
+        layout(xaxis=list(title="Years",tickfont=list(size=9)),
+               yaxis=list(title="GDP",tickfont=list(size=9)))
+    })
+    
+    output$click_amusement_pie<- renderPlotly({
+      df <- as.data.frame(t(gdp.aer.rpp)[c(1,7),])
+      colnames(df) <- gdp.aer.rpp[,1]
+      df <- df[-1,]
+      plot.df <- data.frame(year=2016,aer=df[,click$id])
+      plot.df$aer <- as.character(plot.df$aer)
+      plot.df$aer <- as.numeric(substr(plot.df$aer,1,nchar(plot.df$aer)-1))
+      plot.df$uaer <- 100-plot.df$aer
+      plot.df[2,] <- c("YEAR","AER","UAER")
+      plot.df <- t(plot.df)
+      plot.df <- plot.df[-1,]
+      plot.df[,1] <- as.numeric(as.character(plot.df[,1]))/100
+      plot.df <- as.data.frame(plot.df)
+      plot_ly(data=plot.df,values = ~plot.df[,1],labels = ~plot.df[,2], type='pie') %>%
+        layout(xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+               yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+    })
   })
   
   output$recommandationtable<-renderDataTable({
@@ -301,4 +302,3 @@ server<- function(input, output, session){
   
   
 }
-## end 2D map
