@@ -102,9 +102,9 @@ ui<- navbarPage(
   tabPanel("Home",
            htmlOutput("blankspace"),
            titlePanel("Job Advisor"),
-           h4(htmlOutput("text")),
-           htmlOutput("teammates")
-  ),
+           h3(htmlOutput("text")),
+           h5(htmlOutput("text2"))
+           ),
   
   
   

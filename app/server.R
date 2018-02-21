@@ -100,12 +100,16 @@ server<- function(input, output, session){
   output$blankspace = renderUI({
     HTML("<br/><br/><br/><br/><br/><br/><br/><br/>")
   })
+  
   output$text = renderUI({
-    HTML("<br/><br/><br/>Give our professional future career choices for you
-      <br/>Using statistics data from the Bureau of Labor Statistics and Bureau of Economic Analysis
+    HTML("<br/><br/>Give our professional future career choices for you
+      <br/><br/>Using statistics data from the Bureau of Labor Statistics and Bureau of Economic Analysis
          ")
   })
   
+  output$text2 = renderUI({
+    HTML("<br/><br/><br/><br/><br/><br/><br/><br/>Wenshan Wang: ww2468@columbia.edu<br/>Junkai Zhang: jz2929@columbia.edu<br/>Sitong Chen: sc4283@columbia.edu<br/>Chenfei Jiang: cj2526@columbia.edu<br/>Jiaqi Dong: jd3418@columbia.edu")
+  })
   
   
   ### Part 2: Choose Your Occupation
