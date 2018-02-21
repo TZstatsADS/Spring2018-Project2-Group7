@@ -106,7 +106,6 @@ server<- function(input, output, session){
   
   output$usmap <- renderLeaflet({
     
-    # tmp.ordered <- subset(data, OCC_TITLE == "Management Occupations")
     tmp<-subset(data,OCC_TITLE == as.character(input$occupation))
     
     mapStates = map("state", fill = TRUE, plot = FALSE)
@@ -115,7 +114,7 @@ server<- function(input, output, session){
     colnames(state.shortname) <- "state.shortname"
     tmp$state.shortname <- substr(tolower(tmp$STATE), 1, 8)
     tmp.ordered <- merge(state.shortname, tmp, by="state.shortname", all.x = T)
-    # new <- cbind(mapStates$names, tmp.ordered)
+    tmp.ordered <- cbind(mapStates$names, tmp.ordered)
     
     if(nrow(tmp.ordered)>0){
       pal <- colorNumeric(palette="YlGnBu", domain=tmp.ordered$A_MEAN)
@@ -135,7 +134,7 @@ server<- function(input, output, session){
                     color = "white",
                     dashArray = "3",
                     fillOpacity = 0.7,
-                    layerId = ~tmp.ordered$STATE,
+                    layerId = ~tmp.ordered$names,
                     highlight = highlightOptions(
                       weight = 5,
                       color = "#666",
@@ -154,44 +153,6 @@ server<- function(input, output, session){
                   opacity = 1)
       
     }
-    
-    ###### 
-    
-    # SetColor <- function(tmp) {
-    #   sapply(tmp$A_MEAN, function(wage) {
-    #     if(wage <= 30000) {
-    #       "lightgray"
-    #     } else if(wage <= 40000) {
-    #       "lightblue"
-    #     } else if(wage <= 50000) {
-    #       "blue"
-    #     } else if(wage <= 70000) {
-    #       "darkblue"
-    #     } else {
-    #       "black"
-    #     } })
-    # }
-    # 
-    # icons <- awesomeIcons(
-    #   icon = 'ios-close',
-    #   iconColor = 'white',
-    #   library = 'ion',
-    #   markerColor = paste(SetColor(tmp))
-    # )
-    # 
-    # 
-    # 
-    # Colors = c("lightgray","lightblue","blue","darkblue","black")
-    # Labels = c("<= 30000","<= 40000","<= 50000","<= 70000","> 70000")
-    # 
-    # leaflet(tmp)%>%addProviderTiles("Esri.WorldStreetMap")%>%
-    #   addAwesomeMarkers(~lon, ~lat, icon=icons, label=~as.character(A_MEAN))%>%  
-    #   setView(lng=-30,lat=28,zoom=2)%>%#put US in the centre
-    #   addLegend("topright", colors = Colors, labels = Labels,
-    #             title = "Wage Level<br/>From Low to High",
-    #             labFormat = labelFormat(prefix = "$"),
-    #             opacity = 1)
-    
     
   })
   
