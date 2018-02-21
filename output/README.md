@@ -1,4 +1,4 @@
-# Project: NYC Open Data
+# Project: 
 ### Output folder
 
 The output directory contains analysis output, processed datasets, logs, or other processed things.
