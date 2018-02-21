@@ -47,6 +47,8 @@ plotMap <- ggplot(usaMap, aes(x = long, y = lat, group = group)) +
 plotInfo <- ggplot(si, aes(x = Rent_Price, y = Price_Level)) + 
   geom_point(aes(size = Crime_Rate, color = Cleardays)) 
 
+mapStates = map("state", fill = TRUE, plot = FALSE)
+
 
 server<- function(input, output, session){
   
@@ -106,7 +108,6 @@ server<- function(input, output, session){
   
   output$usmap <- renderLeaflet({
     
-    mapStates = map("state", fill = TRUE, plot = FALSE)
     tmp<-subset(data,OCC_TITLE == as.character(input$occupation))
     state.shortname <- as.data.frame(substr(mapStates$names, 1, 8))
     colnames(state.shortname) <- "state.shortname"
@@ -214,7 +215,11 @@ server<- function(input, output, session){
     dt.data[,3:8] <- apply(dt.data[,3:8], 2, as.numeric)
     dt.data.scale <- dt.data[,1:2]
     dt.data.scale[,3:8] <- apply(dt.data[,3:8], 2, rescale)
-    colnames(dt.data.scale) <- c("STATE","Title","Salary","AER","RPP Price","RPP Rents","Crime Rate","Cleardays")
+    dt.data.scale[,3:8] <- round( dt.data.scale[,3:8],2)
+    colnames(dt.data.scale) <- c("STATE","Title","Salary","Recreation Level","RPP Price","RPP Rents","Crime Rate","Cleardays")
+    #proper function
+    proper=function(x) paste0(toupper(substr(x, 1, 1)), tolower(substring(x, 2)))
+    dt.data.scale$STATE <- proper(dt.data.scale$STATE)
     dt.data.scale[,c(5,6,7)] <- (dt.data.scale[,c(5,6,7)])*(-1)
     
     # Assign the input value
@@ -225,7 +230,6 @@ server<- function(input, output, session){
     # Rank calculation 
     dt.data.scale<-as.data.frame(dt.data.scale)
     dt.data.scale$score<- 0.5*dt.data.scale[,select1]+0.3*dt.data.scale[,select2]+0.2*dt.data.scale[,select3]
-    ??order
     order.score<-order(-dt.data.scale$score)
     dt.data.scale$TotalRank[order.score] <- 1:nrow(dt.data.scale)
     
@@ -233,7 +237,7 @@ server<- function(input, output, session){
     dt.data.scale<-dt.data.scale[order(dt.data.scale$TotalRank),]
     
     dt.data.scale<-dt.data.scale %>%
-      dplyr::select(TotalRank,select1,select2,select3,everything()) %>%
+      dplyr::select(TotalRank,"STATE","Title",select1,select2,select3,everything()) %>%
       dplyr::select(-score)
     
   })

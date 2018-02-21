@@ -29,7 +29,7 @@ state_list <- data.state$STATE
 si <- read.csv("State_info.csv", header = T, stringsAsFactors = F)
 usaMap <- map_data("state")
 
-preference_list <- c("Salary","Crime Rate","Cleardays","AER","RPP Rents","RPP Price")
+preference_list <- c("Salary","Crime Rate","Cleardays","Recreation Level","RPP Rents","RPP Price")
 
 ui<- navbarPage(
   
@@ -221,7 +221,7 @@ ui<- navbarPage(
   
   
   
-  tabPanel("State Info Detail",
+  tabPanel("Your Recommandation",
            titlePanel("State Info Detail"),
            column(
              width = 6,
@@ -234,34 +234,32 @@ ui<- navbarPage(
            
            
            #Give a Recommandation
-           titlePanel("Give a Recommandation"),
+           titlePanel("Your Recommandation"),
            
            fluidRow(
-             column(2,
-                    h4("Select Your Preference"),
+             #select your preference
+             column(3,
                     selectizeInput(inputId = "firstpreference",
                                    label  = "First Preference",
                                    choices = preference_list,
-                                   selected ='Salary'),
-                    
+                                   selected ='Salary')),
+             column(3,
                     selectizeInput(inputId = "secondpreference",
                                    label  = "Second Preference",
                                    choices = preference_list,
-                                   selected ='Crime Rate'),
-                    
+                                   selected ='Crime Rate')),
+             column(3,
                     selectizeInput(inputId = "thirdpreference",
                                    label  = "Third Preference",
                                    choices = preference_list,
-                                   selected ='Cleardays'),
-                    column(10,
-                           DT::dataTableOutput("recommandationtable")
-                    )
+                                   selected ='Cleardays')),
+             #datatable
+             column(12,
+                    DT::dataTableOutput("recommandationtable")
              )
            )
-           
   )
+  
 )
-          
 
-
-
+ 
