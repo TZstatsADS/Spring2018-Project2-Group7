@@ -83,7 +83,7 @@ si <- read.csv("state_info.csv", header = T, stringsAsFactors = F)
 
 # Set up the preference list for choice panel 
 # for later use in "Your recommendation" part
-preference_list <- c("Salary","Crime Rate","Cleardays","Recreation Level","RPP Rents","RPP Price")
+preference_list <- c("Salary","Crime Rate","Cleardays","Recreation Level","Rents Level","Price Level")
 
 
 ##############

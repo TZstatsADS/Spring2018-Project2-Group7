@@ -291,7 +291,7 @@ server<- function(input, output, session){
     dt.data.scale <- dt.data[,1:2]
     dt.data.scale[,3:8] <- apply(dt.data[,3:8], 2, rescale)
     dt.data.scale[,3:8] <- round( dt.data.scale[,3:8],2)
-    colnames(dt.data.scale) <- c("STATE","Title","Salary","Recreation Level","RPP Price","RPP Rents","Crime Rate","Cleardays")
+    colnames(dt.data.scale) <- c("STATE","Title","Salary","Recreation Level","Price Level","Rents Level","Crime Rate","Cleardays")
     dt.data.scale$STATE <- proper(dt.data.scale$STATE)
     dt.data.scale[,c(5,6,7)] <- (dt.data.scale[,c(5,6,7)])*(-1)
     
