@@ -113,11 +113,11 @@ ui<- navbarPage(
   tabPanel("Choose Your Occupation",titlePanel("Choose Your Occupation"),
            sidebarLayout(      
              sidebarPanel(
-               selectInput("major1", "Major 1:", 
+               selectInput("major1", "Occupation Group 1:", 
                            choices = choice,selected = 1),
-               selectInput("major2", "Major 2:", 
+               selectInput("major2", "Occupation Group 2:", 
                            choices = choice,selected = 2),
-               selectInput("major3", "Major 3:", 
+               selectInput("major3", "Occupation Group 3:", 
                            choices = choice,selected = 3),
                hr(),
                helpText("Data from Bureau of Labor Statistics: https://www.bls.gov/ and ")
