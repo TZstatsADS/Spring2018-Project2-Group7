@@ -106,10 +106,8 @@ server<- function(input, output, session){
   
   output$usmap <- renderLeaflet({
     
-    tmp<-subset(data,OCC_TITLE == as.character(input$occupation))
-    
     mapStates = map("state", fill = TRUE, plot = FALSE)
-    
+    tmp<-subset(data,OCC_TITLE == as.character(input$occupation))
     state.shortname <- as.data.frame(substr(mapStates$names, 1, 8))
     colnames(state.shortname) <- "state.shortname"
     tmp$state.shortname <- substr(tolower(tmp$STATE), 1, 8)
@@ -134,7 +132,7 @@ server<- function(input, output, session){
                     color = "white",
                     dashArray = "3",
                     fillOpacity = 0.7,
-                    layerId = ~tmp.ordered$names,
+                    layerId = ~tmp.ordered[,1],
                     highlight = highlightOptions(
                       weight = 5,
                       color = "#666",
@@ -159,13 +157,22 @@ server<- function(input, output, session){
   observeEvent(input$usmap_shape_click, {
     click <- input$usmap_shape_click
     
-    output$state_name <- renderText(click$id)
+    tmp<-subset(data,OCC_TITLE == "Management Occupations")
+    state.shortname <- as.data.frame(substr(mapStates$names, 1, 8))
+    colnames(state.shortname) <- "state.shortname"
+    tmp$state.shortname <- substr(tolower(tmp$STATE), 1, 8)
+    tmp.ordered <- merge(state.shortname, tmp, by="state.shortname", all.x = T)
+    tmp.ordered <- cbind(mapStates$names, tmp.ordered)
+    state.name <- tmp.ordered[tmp.ordered[,1] == click$id, "STATE"]
+
+    
+    output$state_name <- renderText(state.name)
     
     output$click_gdp_trend<- renderPlotly({
       df <- as.data.frame(t(gdp.aer.rpp)[1:4,])
       colnames(df) <- gdp.aer.rpp[,1]
       df <- df[-1,]
-      plot.df <- data.frame(year=2014:2016,gdp=df[,click$id])
+      plot.df <- data.frame(year=2014:2016,gdp=df[,state.name])
       plot_ly(x=plot.df$year,y=plot.df$gdp, type='scatter', mode = 'lines') %>%
         layout(xaxis=list(title="Years",tickfont=list(size=9)),
                yaxis=list(title="GDP",tickfont=list(size=9)))
@@ -175,7 +182,7 @@ server<- function(input, output, session){
       df <- as.data.frame(t(gdp.aer.rpp)[c(1,7),])
       colnames(df) <- gdp.aer.rpp[,1]
       df <- df[-1,]
-      plot.df <- data.frame(year=2016,aer=df[,click$id])
+      plot.df <- data.frame(year=2016,aer=df[,state.name])
       plot.df$aer <- as.character(plot.df$aer)
       plot.df$aer <- as.numeric(substr(plot.df$aer,1,nchar(plot.df$aer)-1))
       plot.df$uaer <- 100-plot.df$aer
@@ -261,5 +268,8 @@ server<- function(input, output, session){
   
   # End State info Detail
   
+  options(warn = -1)  # for ignoring the incompatibility among ggplot2, plotly and shiny widget IDs.
   
 }
+
+
