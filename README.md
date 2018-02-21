@@ -1,6 +1,6 @@
 # Project 2: Open Data App - an RShiny app development project
 
-###[Job Advisor_Group7](https://wenshan.shinyapps.io/jobadvisor/)
+[Job Advisor_Group7](https://wenshan.shinyapps.io/jobadvisor/)
 
 ![screenshot](doc/1.png)
 ![screenshot](doc/2.png)
@@ -33,17 +33,4 @@ Wenshan Wang, Junkai Zhang and Sitong Chen designed "Find Your Location" and "Yo
 
 
 
-
-Following [suggestions](http://nicercode.github.io/blog/2013-04-05-projects/) by [RICH FITZJOHN](http://nicercode.github.io/about/#Team) (@richfitz). This folder is orgarnized as follows.
-
-```
-proj/
-????????? app/
-????????? lib/
-????????? data/
-????????? doc/
-????????? output/
-```
-
-Please see each subfolder for a README file.
 
