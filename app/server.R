@@ -46,8 +46,8 @@ gdp.aer.rpp <- read.csv("GDP_AER_RPP.csv",header = TRUE,stringsAsFactors = FALSE
 national<-read.csv("national.csv",header = T)
 
 # Extract the data for the Wage Information section
-data2<-read.csv("state_M2016_2.csv",header = T)
-si <- read.csv("State_info.csv", header = T, stringsAsFactors = F)
+data2<-read.csv("basic_wage_info.csv",header = T)
+si <- read.csv("state_info.csv", header = T, stringsAsFactors = F)
 
 ################################################################
 # Function Definition
