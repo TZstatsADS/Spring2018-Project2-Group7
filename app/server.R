@@ -1,12 +1,25 @@
-#
-# This is the server logic of a Shiny web application. You can run the 
-# application by clicking 'Run App' above.
-#
-# Find out more about building applications with Shiny here:
-# 
-#    http://shiny.rstudio.com/
-#
-#load the packages
+
+################################################################
+# Load the packages
+################################################################
+
+# Packages used
+packages.used=c("varhandle", "leaflet", "shiny", 
+                "ggmap", "ggplot2", "maps",
+                "RColorBrewer", "plotly", "DT", 
+                "scales", "dplyr")
+
+# Check packages that need to be installed.
+packages.needed=setdiff(packages.used, 
+                        intersect(installed.packages()[,1], 
+                                  packages.used))
+
+# Install additional packages
+if(length(packages.needed)>0){
+  install.packages(packages.needed, dependencies = TRUE)
+}
+
+# Library packages
 library("varhandle")
 library("leaflet")
 library("shiny")
@@ -19,12 +32,28 @@ library("DT")
 library("scales")
 library("dplyr")
 
-data <- read.csv("salary2016.csv",header = TRUE,stringsAsFactors = FALSE)
-gdp.aer.rpp <- read.csv("GDP_AER_RPP.csv",header = TRUE,stringsAsFactors = FALSE)
-national<-read.csv("national.csv",header = T)
-data2<-read.csv("state_M2016_2.csv",header = T)
+################################################################
+# Data Preparation
+################################################################
 
+# Extract the data of occupations and salary for the map section
+data <- read.csv("salary2016.csv",header = TRUE,stringsAsFactors = FALSE)
+
+# Read the data of GDP, AER and RPP
+gdp.aer.rpp <- read.csv("GDP_AER_RPP.csv",header = TRUE,stringsAsFactors = FALSE)
+
+# Extract the data for the Choose Your Occupation section
+national<-read.csv("national.csv",header = T)
+
+# Extract the data for the Wage Information section
+data2<-read.csv("state_M2016_2.csv",header = T)
 si <- read.csv("State_info.csv", header = T, stringsAsFactors = F)
+
+################################################################
+# Function Definition
+################################################################
+
+# which_state for transfering the coordinates into state name
 which_state <- function(mapData, long, lat) {
   mapData$long_diff <- mapData$long - long
   mapData$lat_diff <- mapData$lat - lat
@@ -41,31 +70,47 @@ which_state <- function(mapData, long, lat) {
   rangeAngle <- tapply(mapData$angle, mapData$region, function(x) max(x) - min(x))
   return(names(sort(rangeAngle, decreasing = TRUE))[1])
 }
+
+# Proper function for turning the first letter into upper case 
+proper <- function(x) paste0(toupper(substr(x, 1, 1)), tolower(substring(x, 2)))
+
+################################################################
+# Map Preparation for the Your Recommendation
+################################################################ 
+
+# Main map used in the Find Your Location session
+mapStates = map("state", fill = TRUE, plot = FALSE)
+
+# Map Preparation for the Your Recommendation
 usaMap <- map_data("state")
 plotMap <- ggplot(usaMap, aes(x = long, y = lat, group = group)) + 
   geom_polygon(fill = "white", color = "black")
 plotInfo <- ggplot(si, aes(x = Rent_Price, y = Price_Level)) + 
   geom_point(aes(size = Crime_Rate, color = Cleardays)) 
 
-mapStates = map("state", fill = TRUE, plot = FALSE)
-
+################################################################
+# Server Section
+################################################################
 
 server<- function(input, output, session){
   
-  ##Introduction
+  
+  
+  ### Part 1: Homepage
   output$blankspace = renderUI({
     HTML("<br/><br/><br/><br/><br/><br/><br/><br/>")
   })
   output$text = renderUI({
-    HTML("<br/><br/><br/>Our project uses statistics provided by the Department of Labor <br/>
-         to help with future career choices")
+    HTML("<br/><br/><br/>Give our professional future career choices for you
+      <br/>Using statistics data from the Bureau of Labor Statistics and Bureau of Economic Analysis
+         ")
   })
   
-  ## Part 1
   
   
+  ### Part 2: Choose Your Occupation
   output$Plot <- renderPlotly({
-    
+    # Generate the sub data frame for the visualization
     df1<-data.frame(Occupation=rep(national[input$major1,1],each=3),
                     Year=c(2012,2013,2014),
                     Annual_Wage=unlist(national[input$major1,2:4]))
@@ -77,6 +122,7 @@ server<- function(input, output, session){
                     Annual_Wage=unlist(national[input$major3,2:4]))
     df<-rbind(df1,df2,df3)
     
+    # Comparison Plot
     p<-ggplot(data=df, aes(x=Year, y=Annual_Wage, fill=Occupation)) +
       geom_bar(stat="identity",position=position_dodge())+
       scale_fill_brewer(palette="Blues")+
@@ -86,47 +132,41 @@ server<- function(input, output, session){
     
   })
   
-  output$table <- DT::renderDataTable(DT::datatable({
-    
-    if (input$state != "All") {
-      data2 <- data2[data2$State == input$state,]
-    }
-    if (input$major != 00) {
-      data2 <- data2[substr(data2$OCC_CODE,start = 1,stop = 2) == input$major,]
-    }
-    
-    data2<-data2[,-2]
-    data2
-  }))
   
   
+  ### Part 3: Find Your Location
   
-  ## Part 2
-  
-  
-  ## 2D map
-  
+  ## Leaflet map
   output$usmap <- renderLeaflet({
-    
+    # Extract the data based on the user's choice
+    # Subset the data to the occupation that the user has chosen
     tmp<-subset(data,OCC_TITLE == as.character(input$occupation))
+    
+    # Match the default state name in mapStates to the state name in our data (tmp)
     state.shortname <- as.data.frame(substr(mapStates$names, 1, 8))
     colnames(state.shortname) <- "state.shortname"
     tmp$state.shortname <- substr(tolower(tmp$STATE), 1, 8)
     tmp.ordered <- merge(state.shortname, tmp, by="state.shortname", all.x = T)
     tmp.ordered <- cbind(mapStates$names, tmp.ordered)
     
-    if(nrow(tmp.ordered)>0){
+    # Only draw the map when occupation is selected (tmp is not NULL)
+    if(nrow(tmp)>0){
+      
+      # Map the different levels of salary to different colors
       pal <- colorNumeric(palette="YlGnBu", domain=tmp.ordered$A_MEAN)
       
+      # Prepare the layer labels to show state name and salary 
+      # when the mouse is over certain states
       labels <- sprintf(
         "<strong>%s</strong><br/>$ %g Annual Salary",
         tmp.ordered$STATE, tmp.ordered$A_MEAN) %>% 
         lapply(htmltools::HTML)
       
-      
+      # Draw the leaflet map
       leaflet(data = mapStates) %>%
         addProviderTiles("Stamen.TonerLite") %>%  # default map, base layer
         
+        # Draw color polygons over states according to salary in selected occupation
         addPolygons(fillColor = ~pal(tmp.ordered$A_MEAN),
                     weight = 2,
                     opacity = 1,
@@ -155,7 +195,9 @@ server<- function(input, output, session){
     
   })
   
+  # Output Panel
   observeEvent(input$usmap_shape_click, {
+    # Observe the map shape click
     click <- input$usmap_shape_click
     
     tmp<-subset(data,OCC_TITLE == "Management Occupations")
@@ -166,9 +208,10 @@ server<- function(input, output, session){
     tmp.ordered <- cbind(mapStates$names, tmp.ordered)
     state.name <- tmp.ordered[tmp.ordered[,1] == click$id, "STATE"]
 
-    
+    # display the state name in the output panel
     output$state_name <- renderText(state.name)
     
+    # display the line chart of GDP trend in the output panel
     output$click_gdp_trend<- renderPlotly({
       df <- as.data.frame(t(gdp.aer.rpp)[1:4,])
       colnames(df) <- gdp.aer.rpp[,1]
@@ -179,6 +222,7 @@ server<- function(input, output, session){
                yaxis=list(title="GDP",tickfont=list(size=9)))
     })
     
+    # display the pie chart of recreation level in the output panel
     output$click_amusement_pie<- renderPlotly({
       df <- as.data.frame(t(gdp.aer.rpp)[c(1,7),])
       colnames(df) <- gdp.aer.rpp[,1]
@@ -198,53 +242,10 @@ server<- function(input, output, session){
     })
   })
   
-  output$recommandationtable<-renderDataTable({
-    # Data preparation
-    tmp<-subset(data,OCC_TITLE == as.character(input$occupation))
-    dt.data.1 <- as.data.frame(tmp[,c(5,6,8)])
-    aer.rpp_2016 <- gdp.aer.rpp[,c("Area","AER_2016","RPPs_Goods_2016","RPPs_Rents_2016")]
-    colnames(aer.rpp_2016) <- c("STATE","AER","RPP_GOODS","RPP_RENTS")
-    dt.data.2 <- merge(dt.data.1,aer.rpp_2016,by = "STATE")
-    si2 <- si[,c(2,3,6)]
-    si2$STATE <- tolower(si2$STATE)
-    dt.data.2$STATE <- tolower(dt.data.2$STATE)
-    dt.data <- merge(dt.data.2,si2,by = "STATE")
-    colname.data <- colnames(dt.data)
-    dt.data$AER <- as.character(dt.data$AER)
-    dt.data$AER <- as.numeric(substr(dt.data$AER,1,nchar(dt.data$AER)-1))
-    dt.data[,3:8] <- apply(dt.data[,3:8], 2, as.numeric)
-    dt.data.scale <- dt.data[,1:2]
-    dt.data.scale[,3:8] <- apply(dt.data[,3:8], 2, rescale)
-    dt.data.scale[,3:8] <- round( dt.data.scale[,3:8],2)
-    colnames(dt.data.scale) <- c("STATE","Title","Salary","Recreation Level","RPP Price","RPP Rents","Crime Rate","Cleardays")
-    #proper function
-    proper=function(x) paste0(toupper(substr(x, 1, 1)), tolower(substring(x, 2)))
-    dt.data.scale$STATE <- proper(dt.data.scale$STATE)
-    dt.data.scale[,c(5,6,7)] <- (dt.data.scale[,c(5,6,7)])*(-1)
-    
-    # Assign the input value
-    select1<-as.character(input$firstpreference)
-    select2<-as.character(input$secondpreference)
-    select3<-as.character(input$thirdpreference)
-    
-    # Rank calculation 
-    dt.data.scale<-as.data.frame(dt.data.scale)
-    dt.data.scale$score<- 0.5*dt.data.scale[,select1]+0.3*dt.data.scale[,select2]+0.2*dt.data.scale[,select3]
-    order.score<-order(-dt.data.scale$score)
-    dt.data.scale$TotalRank[order.score] <- 1:nrow(dt.data.scale)
-    
-    #sort table 
-    dt.data.scale<-dt.data.scale[order(dt.data.scale$TotalRank),]
-    
-    dt.data.scale<-dt.data.scale %>%
-      dplyr::select(TotalRank,"STATE","Title",select1,select2,select3,everything()) %>%
-      dplyr::select(-score)
-    
-  })
   
-  # End leaflet
   
-  # State info Detail
+  ### Part 4: Your Recommendation
+  
   output$map <- renderPlot({
     plotMap
     # coord_map(), do not use it. More discussion next section.
@@ -270,7 +271,68 @@ server<- function(input, output, session){
     })
   })
   
-  # End State info Detail
+  # Display the recommendation table based on user's inputs
+  output$recommandationtable<-renderDataTable({
+    
+    # Data preparation
+    tmp<-subset(data,OCC_TITLE == as.character(input$occupation))
+    dt.data.1 <- as.data.frame(tmp[,c(5,6,8)])
+    aer.rpp_2016 <- gdp.aer.rpp[,c("Area","AER_2016","RPPs_Goods_2016","RPPs_Rents_2016")]
+    colnames(aer.rpp_2016) <- c("STATE","AER","RPP_GOODS","RPP_RENTS")
+    dt.data.2 <- merge(dt.data.1,aer.rpp_2016,by = "STATE")
+    si2 <- si[,c(2,3,6)]
+    si2$STATE <- tolower(si2$STATE)
+    dt.data.2$STATE <- tolower(dt.data.2$STATE)
+    dt.data <- merge(dt.data.2,si2,by = "STATE")
+    colname.data <- colnames(dt.data)
+    dt.data$AER <- as.character(dt.data$AER)
+    dt.data$AER <- as.numeric(substr(dt.data$AER,1,nchar(dt.data$AER)-1))
+    dt.data[,3:8] <- apply(dt.data[,3:8], 2, as.numeric)
+    dt.data.scale <- dt.data[,1:2]
+    dt.data.scale[,3:8] <- apply(dt.data[,3:8], 2, rescale)
+    dt.data.scale[,3:8] <- round( dt.data.scale[,3:8],2)
+    colnames(dt.data.scale) <- c("STATE","Title","Salary","Recreation Level","RPP Price","RPP Rents","Crime Rate","Cleardays")
+    dt.data.scale$STATE <- proper(dt.data.scale$STATE)
+    dt.data.scale[,c(5,6,7)] <- (dt.data.scale[,c(5,6,7)])*(-1)
+    
+    # Assign the input value
+    select1<-as.character(input$firstpreference)
+    select2<-as.character(input$secondpreference)
+    select3<-as.character(input$thirdpreference)
+    
+    # Rank calculation 
+    dt.data.scale<-as.data.frame(dt.data.scale)
+    dt.data.scale$score<- 0.5*dt.data.scale[,select1]+0.3*dt.data.scale[,select2]+0.2*dt.data.scale[,select3]
+    order.score<-order(-dt.data.scale$score)
+    dt.data.scale$TotalRank[order.score] <- 1:nrow(dt.data.scale)
+    
+    # Sort table 
+    dt.data.scale<-dt.data.scale[order(dt.data.scale$TotalRank),]
+    
+    # Reorder the columns
+    dt.data.scale<-dt.data.scale %>%
+      dplyr::select(TotalRank,"STATE","Title",select1,select2,select3,everything()) %>%
+      dplyr::select(-score)
+    
+  })
+  
+  
+  
+  ### Part 5: Basic Wage Info
+  
+  # Display the main data we used in the project
+  output$table <- DT::renderDataTable(DT::datatable({
+    
+    if (input$state != "All") {
+      data2 <- data2[data2$State == input$state,]
+    }
+    if (input$major != 00) {
+      data2 <- data2[substr(data2$OCC_CODE,start = 1,stop = 2) == input$major,]
+    }
+    
+    data2<-data2[,-2]
+    data2
+  }))
   
   options(warn = -1)  # for ignoring the incompatibility among ggplot2, plotly and shiny widget IDs.
   
