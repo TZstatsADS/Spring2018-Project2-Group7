@@ -14,6 +14,28 @@ data.Alabama <- data[data$STATE=="Alabama",]
 major <- as.character(data.Alabama[data.Alabama$OCC_GROUP=="major","OCC_TITLE"])
 data.Alabama$first2 <- substr(data.Alabama$OCC_CODE, 1, 2)
 data2<-read.csv("state_M2016_2.csv",header = T)
+choice <- list("Management Occupations" = 1, 
+                "Business and Financial Operations Occupations" = 2, 
+                "Computer and Mathematical Occupations" = 3,
+                "Architecture and Engineering Occupations" = 4,
+                "Life, Physical, and Social Science Occupations" = 5,
+                "Community and Social Service Occupations" = 6,
+                "Legal Occupations" = 7,
+                "Education, Training, and Library Occupations" = 8,
+                "Arts, Design, Entertainment, Sports, and Media Occupations" = 9,
+                "Healthcare Practitioners and Technical Occupations" = 10,
+                "Healthcare Support Occupations" = 11,
+                "Protective Service Occupations" = 12,
+                "Food Preparation and Serving Related Occupations" = 13,
+                "Building and Grounds Cleaning and Maintenance Occupations" = 14,
+                "Personal Care and Service Occupations" = 15,
+                "Sales and Related Occupations" = 16,
+                "Office and Administrative Support Occupations" = 17,
+                "Farming, Fishing, and Forestry Occupations" = 18,
+                "Construction and Extraction Occupations" = 19,
+                "Installation, Maintenance, and Repair Occupations" = 20,
+                "Production Occupations" = 21,
+                "Transportation and Material Moving Occupations" = 22)
 
 return_detail_given_major <- function(major_str){
   first2_code <- data.Alabama[data.Alabama$OCC_TITLE==major_str, "first2"]
@@ -51,28 +73,7 @@ ui<- navbarPage(
            
            sidebarLayout(      
              
-             sidebarPanel(choice <<- list("Management Occupations" = 1, 
-                                          "Business and Financial Operations Occupations" = 2, 
-                                          "Computer and Mathematical Occupations" = 3,
-                                          "Architecture and Engineering Occupations" = 4,
-                                          "Life, Physical, and Social Science Occupations" = 5,
-                                          "Community and Social Service Occupations" = 6,
-                                          "Legal Occupations" = 7,
-                                          "Education, Training, and Library Occupations" = 8,
-                                          "Arts, Design, Entertainment, Sports, and Media Occupations" = 9,
-                                          "Healthcare Practitioners and Technical Occupations" = 10,
-                                          "Healthcare Support Occupations" = 11,
-                                          "Protective Service Occupations" = 12,
-                                          "Food Preparation and Serving Related Occupations" = 13,
-                                          "Building and Grounds Cleaning and Maintenance Occupations" = 14,
-                                          "Personal Care and Service Occupations" = 15,
-                                          "Sales and Related Occupations" = 16,
-                                          "Office and Administrative Support Occupations" = 17,
-                                          "Farming, Fishing, and Forestry Occupations" = 18,
-                                          "Construction and Extraction Occupations" = 19,
-                                          "Installation, Maintenance, and Repair Occupations" = 20,
-                                          "Production Occupations" = 21,
-                                          "Transportation and Material Moving Occupations" = 22),
+             sidebarPanel(
                           selectInput("major1", "Major 1:", 
                                       choices = choice,selected = 1),
                           selectInput("major2", "Major 2:", 
